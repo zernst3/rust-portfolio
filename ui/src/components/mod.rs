@@ -1,3 +1,4 @@
+pub mod ai_architecture;
 pub mod close;
 pub mod credentials;
 pub mod home;
@@ -6,6 +7,7 @@ pub mod not_found;
 pub mod starting_screen;
 pub mod writing;
 
+pub use ai_architecture::AIArchitecture;
 pub use close::Close;
 pub use credentials::Credentials;
 pub use home::Home;
