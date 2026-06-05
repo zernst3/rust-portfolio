@@ -1,0 +1,62 @@
+[workspace]
+resolver = "2"
+members = ["server", "ui"]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.83"
+authors = ["Zachary Ernst <zernst3@live.com>"]
+license = "MIT"
+repository = "https://github.com/zernst3/rust-portfolio"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+
+[workspace.dependencies]
+# Dioxus Fullstack — SSR + hydration shape per the port-direction decision.
+# Pinned to a single line for cross-crate consistency.
+dioxus = { version = "0.7", features = ["fullstack", "router"] }
+
+# Backend — Axum + Tokio mirror the agora MONOLITH-1 stance: one binary,
+# one process, one port serves SSR HTML + /api/* routes + static assets.
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip"] }
+
+# Bevy — fullscreen background scene rendered to a canvas behind Dioxus DOM.
+# Pinned to the latest stable 0.14 line; bot reverse-engineers the current
+# three.js scene into Bevy primitives as the v0.1 baseline.
+bevy = { version = "0.14", default-features = false, features = [
+    "bevy_winit",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_asset",
+    "webgl2",
+    "x11",
+    "tonemapping_luts",
+    "ktx2",
+    "zstd",
+] }
+
+# Errors — thiserror per crate per RUST-DOMAIN-4. anyhow only at app entry.
+thiserror = "2"
+anyhow = "1"
+
+# Serde for DTOs on the wire (contact form + pageview payloads).
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# HTTP client for Mailgun.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# Tracing for observability.
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

@@ -1,0 +1,20 @@
+target/
+dist/
+.env
+.env.*
+!.env.example
+
+# Wrapper-side artifacts the routine creates (gitignored — they live
+# only in the local clone). The routine writes:
+#   .overnight-portfolio-work-queue.md  — phase + items
+#   .overnight-portfolio-decisions_needed.md  — open routing items
+#   .overnight-portfolio-auto-calls-ledger.md — clear-winner self-calls
+#   .overnight-portfolio-no-push.flag — disables push for one session
+.overnight-portfolio-*.md
+.overnight-portfolio-*.flag
+
+# Dioxus build artifacts.
+.dioxus/
+
+# macOS noise.
+.DS_Store
