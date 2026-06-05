@@ -15,7 +15,10 @@ fn valid_contact_body() -> Body {
 }
 
 #[tokio::test]
-async fn contact_valid_payload_returns_no_content() -> anyhow::Result<()> {
+async fn contact_valid_payload_without_mailgun_returns_503() -> anyhow::Result<()> {
+    // MAILGUN_API_KEY and MAILGUN_DOMAIN are not set in the test environment.
+    // The handler reaches the env-var check, logs the missing config, and returns 503.
+    // 204 requires a live Mailgun configuration; that is tested in staging.
     let app = server::build_router();
     let response = app
         .oneshot(
@@ -26,7 +29,7 @@ async fn contact_valid_payload_returns_no_content() -> anyhow::Result<()> {
                 .body(valid_contact_body())?,
         )
         .await?;
-    assert_eq!(response.status(), StatusCode::NO_CONTENT);
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
     Ok(())
 }
 

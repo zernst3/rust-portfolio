@@ -7,6 +7,7 @@ use tower_http::services::ServeDir;
 
 pub mod dto;
 pub mod handlers;
+pub mod mailgun;
 
 /// Build the Axum router: SSR fallback + validated API handlers + static assets.
 ///
