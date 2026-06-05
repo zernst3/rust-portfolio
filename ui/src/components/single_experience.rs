@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 
 use crate::audio::play_sound;
-use crate::components::LayeredArchitectureDiagram;
+use crate::components::{
+    AgentWorkflowDiagram, InfrastructureDiagram, LayeredArchitectureDiagram, RealTimeSyncDiagram,
+};
 use crate::contexts::audio::use_audio_state;
 
 #[derive(Props, Clone, PartialEq)]
@@ -108,8 +110,7 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
                 strong { class: "green-text", "Okta" }
                 " service-to-service tokens, which let internal services reach the WebSocket hub securely."
             }
-            // RealTimeSyncDiagram — stub until v0.1-diagrams phase
-            div { class: "diagram-stub", "data-diagram": "RealTimeSyncDiagram" }
+            RealTimeSyncDiagram {}
         },
         "frontEndModernization" => rsx! {
             p {
@@ -188,8 +189,7 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             p {
                 "High-risk, one-way-door changes (auth, payments, migrations, schema) always come to me before they merge."
             }
-            // AgentWorkflowDiagram — stub until v0.1-diagrams phase
-            div { class: "diagram-stub", "data-diagram": "AgentWorkflowDiagram" }
+            AgentWorkflowDiagram {}
             p {
                 a {
                     href: "/ai-architecture",
@@ -207,8 +207,7 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
                 strong { class: "green-text", "Terraform" }
                 ": App Services, managed Postgres, and networking."
             }
-            // InfrastructureDiagram — stub until v0.1-diagrams phase
-            div { class: "diagram-stub", "data-diagram": "InfrastructureDiagram" }
+            InfrastructureDiagram {}
             hr {}
             p {
                 "Designed "

@@ -55,7 +55,19 @@ pub fn App() -> Element {
             href: "/assets/styles/components/ProfessionalExperience/SingleExperience.css"
         }
         document::Stylesheet {
+            href: "/assets/styles/components/ProfessionalExperience/AgentWorkflowDiagram/AgentWorkflowDiagram.css"
+        }
+        document::Stylesheet {
+            href: "/assets/styles/components/ProfessionalExperience/CICDPipelineDiagram/CICDPipelineDiagram.css"
+        }
+        document::Stylesheet {
             href: "/assets/styles/components/ProfessionalExperience/LayeredArchitectureDiagram/LayeredArchitectureDiagram.css"
+        }
+        document::Stylesheet {
+            href: "/assets/styles/components/ProfessionalExperience/RealTimeSyncDiagram/RealTimeSyncDiagram.css"
+        }
+        document::Stylesheet {
+            href: "/assets/styles/components/ProfessionalExperience/InfrastructureDiagram/InfrastructureDiagram.css"
         }
 
         div { id: "App",
