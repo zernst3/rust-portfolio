@@ -86,7 +86,7 @@ Bevy's role in this repo is rendering the fullscreen 3D background canvas behind
 
 **Why:** the background is purely decorative; there is no design need for the 3D layer to interact with the DOM. Bevy-owns-everything would add weeks of integration work for no portfolio benefit.
 
-**How to apply:** the Bevy app is constructed in `server/src/bevy_scene.rs` and compiled into the WASM bundle. It starts on `DOMContentLoaded` and mounts to a known canvas element id. Dioxus components NEVER `use bevy::*`.
+**How to apply:** the Bevy app lives in its own workspace crate at `bevy_scene/` (lib type `cdylib`, target `wasm32-unknown-unknown`). The `#[wasm_bindgen(start)]` entry constructs the `App` and runs it; JS in the Dioxus app loads the resulting `.wasm` on `DOMContentLoaded` and Bevy mounts to the canvas at `#bevy-canvas`. The `server` and `ui` crates NEVER `use bevy::*`. The original PORT-BEVY-1 text referenced `server/src/bevy_scene.rs` — that was an early-draft path; corrected to the separate crate on 2026-06-05 after PORT-DECISION-bevy-crate-location.
 
 ---
 

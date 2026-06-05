@@ -1,0 +1,20 @@
+[package]
+name = "bevy_scene"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+# cdylib so wasm-bindgen-cli can produce a JS-loadable WASM module.
+# rlib so other workspace crates (or tests) could pull in helpers.
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+wasm-bindgen = { workspace = true }
