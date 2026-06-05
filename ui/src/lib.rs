@@ -39,6 +39,10 @@ pub fn App() -> Element {
         document::Stylesheet { href: "/assets/styles/components/Home/Home.css" }
         document::Stylesheet { href: "/assets/styles/components/StartingScreen/StartingScreen.css" }
         document::Stylesheet { href: "/assets/styles/components/Close/Close.css" }
+        document::Stylesheet { href: "/assets/styles/components/Manifesto/Manifesto.css" }
+        document::Stylesheet { href: "/assets/styles/components/NotFound/NotFound.css" }
+        document::Stylesheet { href: "/assets/styles/components/Credentials/Credentials.css" }
+        document::Stylesheet { href: "/assets/styles/components/Writing/Writing.css" }
 
         div { id: "App",
             components::Home {}

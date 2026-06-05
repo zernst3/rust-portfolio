@@ -1,7 +1,15 @@
 pub mod close;
+pub mod credentials;
 pub mod home;
+pub mod manifesto;
+pub mod not_found;
 pub mod starting_screen;
+pub mod writing;
 
 pub use close::Close;
+pub use credentials::Credentials;
 pub use home::Home;
+pub use manifesto::Manifesto;
+pub use not_found::NotFound;
 pub use starting_screen::StartingScreen;
+pub use writing::Writing;
