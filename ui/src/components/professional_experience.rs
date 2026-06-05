@@ -159,7 +159,7 @@ pub fn ProfessionalExperience() -> Element {
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
                                             span { class: "entity-name",
-                                                img { src: "/finance.svg", alt: "", class: "header-icon-svg" }
+                                                img { src: "/assets/images/finance.svg", alt: "", class: "header-icon-svg" }
                                                 " S&P Global Market Intelligence"
                                             }
                                             span { class: "dots" }
@@ -201,7 +201,7 @@ pub fn ProfessionalExperience() -> Element {
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
                                             span { class: "entity-name",
-                                                img { src: "/city.svg", alt: "", class: "header-icon-svg" }
+                                                img { src: "/assets/images/city.svg", alt: "", class: "header-icon-svg" }
                                                 " The New Agora (Independent Project)"
                                             }
                                             span { class: "dots" }
@@ -479,7 +479,7 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 span { class: "custom-preview-date", "Published to crates.io" }
             }
             img {
-                src: "/chorale-qa-harness.png",
+                src: "/assets/images/chorale-qa-harness.png",
                 alt: "Chorale QA harness showing a 10,010-row data table with sorting, filtering, virtualization, selection, column visibility, CSV export, and column resize enabled",
                 class: "custom-preview-image",
             }
@@ -489,7 +489,7 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 ", published to crates.io."
             }
             img {
-                src: "/chorale-custom-cells.png",
+                src: "/assets/images/chorale-custom-cells.png",
                 alt: "Chorale custom cell rendering example with Service, Status, and Health columns, showing badge variants and arbitrary Dioxus markup keyed by column id",
                 class: "custom-preview-image",
             }
@@ -544,7 +544,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
                 span { class: "custom-preview-date", "v0.1.0, May 2026" }
             }
             img {
-                src: "/camerata-overview.png",
+                src: "/assets/images/camerata-overview.png",
                 alt: "Camerata desktop GUI showing the principle selection view, with domains and rules listed for adoption",
                 class: "custom-preview-image",
             }
@@ -554,7 +554,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
                 ". It generates machine-enforceable AI-agent config (AGENTS.md, CONVENTIONS.md) from ~95 starter principles, each a TOML rule with explicit alternatives and a test for what qualifies."
             }
             img {
-                src: "/camerata-principle.png",
+                src: "/assets/images/camerata-principle.png",
                 alt: "Camerata desktop GUI showing a single principle's detail view with summary, why, and adoption options",
                 class: "custom-preview-image",
             }
