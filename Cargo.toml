@@ -26,7 +26,7 @@ dioxus = { version = "0.7", features = ["fullstack", "router"] }
 
 # Backend — Axum + Tokio mirror the agora MONOLITH-1 stance: one binary,
 # one process, one port serves SSR HTML + /api/* routes + static assets.
-axum = "0.8"
+axum = "0.8.9"
 tokio = { version = "1", features = ["full"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip"] }
