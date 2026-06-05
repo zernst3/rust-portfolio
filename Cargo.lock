@@ -718,7 +718,7 @@ dependencies = [
  "bevy_ptr",
  "bevy_reflect",
  "bevy_render",
- "bevy_scene 0.14.2",
+ "bevy_scene",
  "bevy_sprite",
  "bevy_tasks",
  "bevy_time",
@@ -901,17 +901,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.117",
-]
-
-[[package]]
-name = "bevy_scene"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "getrandom 0.3.4",
- "getrandom 0.4.2",
- "uuid",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -4326,6 +4315,17 @@ dependencies = [
  "pin-project-lite",
  "rustix 1.1.4",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "portfolio_scene"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "getrandom 0.3.4",
+ "getrandom 0.4.2",
+ "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]

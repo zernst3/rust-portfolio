@@ -86,7 +86,7 @@ Bevy's role in this repo is rendering the fullscreen 3D background canvas behind
 
 **Why:** the background is purely decorative; there is no design need for the 3D layer to interact with the DOM. Bevy-owns-everything would add weeks of integration work for no portfolio benefit.
 
-**How to apply:** the Bevy app lives in its own workspace crate at `bevy_scene/` (lib type `cdylib`, target `wasm32-unknown-unknown`). The `#[wasm_bindgen(start)]` entry constructs the `App` and runs it; JS in the Dioxus app loads the resulting `.wasm` on `DOMContentLoaded` and Bevy mounts to the canvas at `#bevy-canvas`. The `server` and `ui` crates NEVER `use bevy::*`. The original PORT-BEVY-1 text referenced `server/src/bevy_scene.rs` — that was an early-draft path; corrected to the separate crate on 2026-06-05 after PORT-DECISION-bevy-crate-location.
+**How to apply:** the Bevy app lives in its own workspace crate at `portfolio_scene/` (lib type `cdylib`, target `wasm32-unknown-unknown`). The `#[wasm_bindgen(start)]` entry constructs the `App` and runs it; JS in the Dioxus app loads the resulting `.wasm` on `DOMContentLoaded` and Bevy mounts to the canvas at `#bevy-canvas`. The `server` and `ui` crates NEVER `use bevy::*`. Name history: the original PORT-BEVY-1 text referenced `server/src/bevy_scene.rs` (early-draft path); corrected 2026-06-05 to `bevy_scene/` after PORT-DECISION-bevy-crate-location; renamed 2026-06-05 to `portfolio_scene/` after a Cargo name collision with the Bevy ecosystem's own `bevy_scene` crate broke `cargo build -p bevy_scene`.
 
 ---
 
@@ -94,7 +94,7 @@ Bevy's role in this repo is rendering the fullscreen 3D background canvas behind
 
 The first Bevy scene the bot delivers is a faithful translation of the current React Three Fiber scene in `~/Documents/Repos/MyPortfolioSite/src/`. Geometry, materials, postprocessing chain, and animation loop are translated to Bevy primitives that match as closely as Bevy allows. This becomes the "safe baseline" that ships with v0.1.
 
-After the safe baseline is in `main`, the bot drafts 2–3 alternate scene options (each a separate branch or a separate `bevy_scene_alt_<n>.rs` module behind a feature flag) for Zach to compare. The chosen alternate replaces the safe baseline; if no alternate wins, the safe baseline ships unchanged.
+After the safe baseline is in `main`, the bot drafts 2–3 alternate scene options (each a separate branch or a separate `portfolio_scene/src/alt_<n>.rs` module behind a feature flag) for Zach to compare. The chosen alternate replaces the safe baseline; if no alternate wins, the safe baseline ships unchanged.
 
 **Why:** Zach's explicit ask 2026-06-05 — "A combo of A and B. I'd like to see some options, but create a port of the original as a backup."
 

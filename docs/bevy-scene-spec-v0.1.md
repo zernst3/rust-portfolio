@@ -183,3 +183,7 @@ All five scene elements (camera, fog, lights, bloom, line shader, flight animati
 Additionally, PORT-BEVY-1 references `server/src/bevy_scene.rs` as the Bevy entry point — but `server` is a native binary, not compiled to WASM. The actual Bevy WASM scene must live in the `ui` crate or a dedicated WASM crate. This architectural clarification is also needed from Zach.
 
 See `.overnight-portfolio-decisions_needed.md` for the routing entry.
+
+---
+
+**2026-06-05 update — crate renamed.** Option 2 was chosen and implemented, but the crate was initially named `bevy_scene` which collided with Bevy's own ecosystem crate `bevy_scene@0.14.2` (transitively required by the `bevy` umbrella crate). `cargo build -p bevy_scene` was ambiguous between the two. Crate renamed to `portfolio_scene` the same day; references throughout the codebase updated. References to `bevy_scene` above remain as the historical record of what was considered + first-built.

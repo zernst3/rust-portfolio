@@ -26,7 +26,7 @@ pub fn App() -> Element {
     // Load Bevy WASM scene on first client render (no-op on SSR per PORT-BEVY-1).
     use_effect(|| {
         let _ = document::eval(
-            "import('/assets/bevy_scene.js')\
+            "import('/assets/portfolio_scene.js')\
              .then(function(m){return m.default();})\
              .catch(function(e){console.warn('Bevy scene unavailable',e);});",
         );

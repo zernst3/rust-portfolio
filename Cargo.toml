@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["server", "ui", "bevy_scene"]
+members = ["server", "ui", "portfolio_scene"]
 
 [workspace.package]
 edition = "2021"
@@ -62,6 +62,6 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
-# Bevy WASM entry point and JS interop. Required for the bevy_scene crate
+# Bevy WASM entry point and JS interop. Required for the portfolio_scene crate
 # (cdylib) to be loadable from the browser via wasm-pack / wasm-bindgen-cli.
 wasm-bindgen = "0.2"
