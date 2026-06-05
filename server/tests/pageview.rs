@@ -13,8 +13,11 @@ static ENV_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 #[tokio::test]
 async fn pageview_without_mailgun_returns_503() -> anyhow::Result<()> {
-    // MAILGUN_API_KEY and MAILGUN_DOMAIN are not set in the test environment.
-    // Handler returns 503. 204 requires live Mailgun config; tested in staging.
+    let _guard = ENV_LOCK.lock().await;
+    std::env::remove_var("MAILGUN_API_KEY");
+    std::env::remove_var("MAILGUN_DOMAIN");
+    std::env::remove_var("MAILGUN_BASE_URL");
+    // With no Mailgun config the handler returns 503. 204 requires staging creds.
     let app = server::build_router();
     let response = app
         .oneshot(
@@ -30,7 +33,11 @@ async fn pageview_without_mailgun_returns_503() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn pageview_ignores_body() -> anyhow::Result<()> {
-    // Body is ignored (PORT-API-2). Handler still returns 503 (no Mailgun env).
+    let _guard = ENV_LOCK.lock().await;
+    std::env::remove_var("MAILGUN_API_KEY");
+    std::env::remove_var("MAILGUN_DOMAIN");
+    std::env::remove_var("MAILGUN_BASE_URL");
+    // Body is ignored (PORT-API-2). Handler returns 503 without Mailgun config.
     let app = server::build_router();
     let response = app
         .oneshot(

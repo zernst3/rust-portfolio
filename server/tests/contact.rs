@@ -19,9 +19,12 @@ fn valid_contact_body() -> Body {
 
 #[tokio::test]
 async fn contact_valid_payload_without_mailgun_returns_503() -> anyhow::Result<()> {
-    // MAILGUN_API_KEY and MAILGUN_DOMAIN are not set in the test environment.
-    // The handler reaches the env-var check, logs the missing config, and returns 503.
-    // 204 requires a live Mailgun configuration; that is tested in staging.
+    // Hold ENV_LOCK so concurrent tests cannot set MAILGUN_API_KEY while we run.
+    let _guard = ENV_LOCK.lock().await;
+    std::env::remove_var("MAILGUN_API_KEY");
+    std::env::remove_var("MAILGUN_DOMAIN");
+    std::env::remove_var("MAILGUN_BASE_URL");
+    // With no Mailgun config the handler returns 503. 204 requires staging creds.
     let app = server::build_router();
     let response = app
         .oneshot(

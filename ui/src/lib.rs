@@ -23,6 +23,15 @@ pub fn App() -> Element {
     provide_audio_context();
     provide_mobile_menu_context();
 
+    // Load Bevy WASM scene on first client render (no-op on SSR per PORT-BEVY-1).
+    use_effect(|| {
+        let _ = document::eval(
+            "import('/assets/bevy_scene.js')\
+             .then(function(m){return m.default();})\
+             .catch(function(e){console.warn('Bevy scene unavailable',e);});",
+        );
+    });
+
     rsx! {
         document::Title { "Zachary Ernst" }
         document::Link { rel: "icon", href: "/assets/images/favicon.ico" }
@@ -68,6 +77,12 @@ pub fn App() -> Element {
         }
         document::Stylesheet {
             href: "/assets/styles/components/ProfessionalExperience/InfrastructureDiagram/InfrastructureDiagram.css"
+        }
+
+        // Background canvas — Bevy mounts here per PORT-BEVY-1.
+        canvas {
+            id: "bevy-canvas",
+            style: "position:fixed;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none;background:#0a1f1c;"
         }
 
         div { id: "App",

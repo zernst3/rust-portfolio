@@ -18,3 +18,10 @@ workspace = true
 [dependencies]
 bevy = { workspace = true }
 wasm-bindgen = { workspace = true }
+
+# Force getrandom 0.3 and 0.4 to compile with wasm_js backend for wasm32-unknown-unknown.
+# Cargo feature-unification propagates wasm_js to all transitive users (ahash→bevy_utils, uuid).
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom4 = { package = "getrandom", version = "0.4", features = ["wasm_js"] }
+uuid = { version = "1", features = ["js"] }

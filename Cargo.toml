@@ -38,6 +38,7 @@ bevy = { version = "0.14", default-features = false, features = [
     "bevy_winit",
     "bevy_render",
     "bevy_core_pipeline",
+    "bevy_pbr",
     "bevy_asset",
     "webgl2",
     "x11",
