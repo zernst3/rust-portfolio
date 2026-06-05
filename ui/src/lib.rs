@@ -54,6 +54,9 @@ pub fn App() -> Element {
         document::Stylesheet {
             href: "/assets/styles/components/ProfessionalExperience/SingleExperience.css"
         }
+        document::Stylesheet {
+            href: "/assets/styles/components/ProfessionalExperience/LayeredArchitectureDiagram/LayeredArchitectureDiagram.css"
+        }
 
         div { id: "App",
             Router::<Route> {}

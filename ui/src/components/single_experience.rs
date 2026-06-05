@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::audio::play_sound;
+use crate::components::LayeredArchitectureDiagram;
 use crate::contexts::audio::use_audio_state;
 
 #[derive(Props, Clone, PartialEq)]
@@ -175,8 +176,7 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
                 strong { class: "green-text", "PostgreSQL" }
                 " schema, keeping the service layers strictly separated so I can add modules without the design drifting."
             }
-            // LayeredArchitectureDiagram — stub until v0.1-diagrams phase
-            div { class: "diagram-stub", "data-diagram": "LayeredArchitectureDiagram" }
+            LayeredArchitectureDiagram {}
         },
         "aiNativeWorkflow" => rsx! {
             p {
