@@ -1,11 +1,13 @@
 pub mod audio;
 pub mod components;
 pub mod contexts;
+pub mod routes;
 
 use dioxus::prelude::*;
 
 use contexts::audio::provide_audio_context;
 use contexts::mobile_menu::provide_mobile_menu_context;
+use routes::Route;
 
 /// Root Dioxus component.
 ///
@@ -53,7 +55,7 @@ pub fn App() -> Element {
         }
 
         div { id: "App",
-            components::Home {}
+            Router::<Route> {}
         }
     }
 }
