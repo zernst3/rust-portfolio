@@ -30,6 +30,9 @@ check:
 	cargo test --workspace
 
 # Serve fullstack dev server via dx CLI.
+# Dioxus 0.7: "fullstack" is a feature flag on the dioxus workspace dep (already
+# enabled). The platform for a fullstack web app is `web` — dx builds the SSR
+# server + the WASM hydration bundle + serves both with hot-reload.
 .PHONY: serve
 serve:
-	dx serve --platform fullstack
+	dx serve --platform web --package server
