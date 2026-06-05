@@ -52,7 +52,9 @@ Even with a clear winner, ROUTE to Zach when the choice:
 
 The bot reads `.overnight-portfolio-work-queue.md` to find the active phase and current item. It works through items in order. Each item produces one focused commit (or a small series of related commits) that compiles clean, passes clippy clean, and passes tests.
 
-After each item, the bot re-reads the queue, picks the next, and continues until: (a) the per-session budget is exhausted, (b) it routes a decision to Zach, or (c) the queue is empty.
+After each item, the bot re-reads the queue, picks the next, and continues until: (a) the per-session budget is exhausted, (b) it routes a decision to Zach for a hard block, or (c) the entire v0.1 work queue is empty.
+
+**Phase advancement is the bot's job (updated 2026-06-05).** When all items in the current `## ACTIVE PHASE` are done, the bot edits the `## ACTIVE PHASE: <name>` line to the next `## Phase v0.1-*` heading in the file and continues working without pausing. Zach explicitly authorized this — phase completions are soft transitions, not routing events. The only "completion" that stops the session is finishing the entire v0.1 work queue (every phase done), at which point the bot sets the pause flag with a `PORT-V0.1-COMPLETE` entry.
 
 ### Code quality gates
 
