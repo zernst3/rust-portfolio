@@ -1,5 +1,6 @@
 pub mod ai_architecture;
 pub mod close;
+pub mod contact_me;
 pub mod credentials;
 pub mod home;
 pub mod manifesto;
@@ -9,6 +10,7 @@ pub mod writing;
 
 pub use ai_architecture::AIArchitecture;
 pub use close::Close;
+pub use contact_me::ContactMe;
 pub use credentials::Credentials;
 pub use home::Home;
 pub use manifesto::Manifesto;
