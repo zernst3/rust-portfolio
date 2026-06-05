@@ -1,0 +1,56 @@
+/* Dioxus transition helpers that replace framer-motion page animations.
+ * Per decision #4 (vanilla CSS transitions + signal helpers). These classes
+ * mirror the React pageVariants / pageTransition behavior (opacity + scale). */
+
+/* Page enter: applied to the root wrapper of every page component. */
+@keyframes page-enter-kf {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.page-enter {
+  animation: page-enter-kf 0.2s ease-out forwards;
+}
+
+/* Delayed fade-in: used by StartingScreen h1 (Welcome). */
+@keyframes fade-in-kf {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-delayed {
+  opacity: 0;
+  animation: fade-in-kf 1.5s ease-out 0.5s forwards;
+}
+
+/* Longer delayed fade-in: StartingScreen h3 (Click Here to Enter). */
+.fade-in-delayed-long {
+  opacity: 0;
+  animation: fade-in-kf 1.5s ease-out 1.5s forwards;
+}
+
+/* Rotating header fade-in: applied via key-rekey in the Home component. */
+@keyframes header-fade-in-kf {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header-fade-in {
+  animation: header-fade-in-kf 0.5s ease-in-out forwards;
+}
+
+/* Name fade-in: Home page h1 (Zachary Ernst). */
+@keyframes name-fade-in-kf {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.name-fade-in {
+  animation: name-fade-in-kf 1.2s ease-out forwards;
+}

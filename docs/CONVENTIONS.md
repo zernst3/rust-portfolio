@@ -168,3 +168,40 @@ Even with a clear winner under the test, the bot ROUTES to Zach (writes to `.ove
 ## Adding new rules
 
 Append below this line. New rule IDs follow the pattern `PORT-<TOPIC>-<NUMBER>` (e.g. `PORT-API-3`, `PORT-BEVY-2`, `PORT-ROBUST-2`). Every new rule includes: summary, why, how to apply, alternatives considered.
+
+---
+
+## PORT-AUDIO-1: Use `document::eval` for audio playback, not `web-sys`
+
+Audio playback in Dioxus WASM uses `document::eval(js_script)` to fire a JS `new Audio(...).play()` call rather than the `web-sys::HtmlAudioElement` API that decision #9 originally named.
+
+**Why:** Adding `web-sys` to `[dependencies]` is a PORT-ROUTE-1 one-way door (dep additions always route to Zach). `dioxus` already pulls `web-sys` as a transitive dep, but the bot must not rely on undeclared transitives. Using `document::eval` (available from the existing `dioxus` dep via `dioxus::prelude::document`) achieves the same behavioral goal with zero new dependencies.
+
+**How to apply:** Fire-and-forget audio:
+```rust
+pub fn play_sound(path: &str, volume: f64) {
+    let _ = document::eval(&format!(
+        "(()=>{{var a=new Audio('{path}');a.volume={volume};a.play().catch(()=>{{}});}})()"
+    ));
+}
+```
+`eval(script)` dispatches the JS immediately via `Function::new_with_args(...).call1(...)` in the `WebEvaluator`. Dropping the `Eval` result is safe for fire-and-forget. On the server (SSR) the `NoOpEvaluator` discards the call silently.
+
+**Alternatives considered:**
+- `web-sys::HtmlAudioElement` — correct per locked decision #9, but requires adding `web-sys` as an explicit dep with feature flags. Blocked by PORT-ROUTE-1. Preferred if Zach ever opens the dep gate.
+- `wasm-bindgen::JsValue` eval — same end state as `document::eval` but requires `wasm-bindgen` dep. Blocked by PORT-ROUTE-1 for same reason.
+- `#[cfg(target_arch = "wasm32")]` no-op on server — valid but the `NoOpEvaluator` already handles the server side, so the cfg guard adds noise without benefit.
+
+---
+
+## PORT-ANIM-1: CSS keyframe animations replace framer-motion; lives in `transitions.css`
+
+All framer-motion page transitions and entrance animations port to CSS `@keyframes` defined in `assets/styles/transitions.css`. The App component loads this file via `document::Stylesheet` alongside the verbatim-ported CSS files.
+
+**Why:** Decision #4 mandates vanilla CSS transitions. The framer-motion variants (`pageVariants`, `pageTransition`) passed as props in the React app become CSS class toggles (`page-enter`, `name-fade-in`, `header-fade-in`, etc.). Dioxus re-keying (changing a node's `key` prop) triggers remount + animation re-fire, replacing `AnimatePresence`.
+
+**How to apply:** Wrap page root elements with `class: "page-enter"`. For elements with delayed entrance, use `fade-in-delayed` / `fade-in-delayed-long`. For rotating headers, use `header-fade-in` on a `key`-rebound element. Do NOT add these animation classes to the verbatim-ported CSS files from the React source.
+
+**Alternatives considered:**
+- `dioxus-motion` crate — rejected per decision #4 (less mature, some animations need CSS fallback anyway).
+- Inline JS `requestAnimationFrame` helpers — valid for imperative animation (e.g. audio-cue timing per decision #4), but overkill for simple entrance fades.

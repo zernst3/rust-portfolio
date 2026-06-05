@@ -1,0 +1,355 @@
+use dioxus::prelude::*;
+use serde::Deserialize;
+
+use crate::audio::play_sound;
+use crate::contexts::audio::use_audio_state;
+use crate::contexts::mobile_menu::use_mobile_menu;
+
+/// Measured position of a nav item — used by the sliding selection bar.
+#[derive(Clone, Deserialize)]
+struct ItemPos {
+    top: f64,
+    height: f64,
+}
+
+struct NavItem {
+    text: &'static str,
+    link: &'static str,
+    icon: &'static str,
+}
+
+struct LinkItem {
+    label: &'static str,
+    href: &'static str,
+}
+
+static NAV_ITEMS: &[NavItem] = &[
+    NavItem {
+        text: "Manifesto",
+        link: "/manifesto",
+        icon: ICON_ARCHITECTURE,
+    },
+    NavItem {
+        text: "AI Architecture",
+        link: "/ai-architecture",
+        icon: ICON_HUB,
+    },
+    NavItem {
+        text: "Work",
+        link: "/work",
+        icon: ICON_WORK_OUTLINE,
+    },
+    NavItem {
+        text: "Writing",
+        link: "/writing",
+        icon: ICON_EDIT_NOTE,
+    },
+    NavItem {
+        text: "Contact Me",
+        link: "/contactme",
+        icon: ICON_CONTACT_MAIL,
+    },
+];
+
+static LINK_ITEMS: &[LinkItem] = &[
+    LinkItem { label: "My Resume",        href: "https://1drv.ms/b/c/2284c063c81ee480/Ee6UQk1nDqxBrHc0NCMPHZoBLolQDGf2z0kSWkY_sE10qw?e=NRvCaC" },
+    LinkItem { label: "My Github",        href: "https://github.com/zernst3" },
+    LinkItem { label: "My LinkedIn",      href: "https://www.linkedin.com/in/zernst3/" },
+    LinkItem { label: "My Medium",        href: "https://zacharyernst.medium.com/" },
+    LinkItem { label: "My Stack Overflow", href: "https://stackoverflow.com/users/3048047/zernst" },
+];
+
+static HEADER_STRINGS: &[&str] = &[
+    "Technical Lead @ S&P Global Market Intelligence | Enterprise Architecture",
+    "Creator & Lead Engineer | Building The New Agora (Independent Venture)",
+    "AI-native development for clean, consistent and scalable code",
+    "Aligning distributed contributors to one architecture across time zones",
+    "Building robust digital infrastructure for the systems that shape our environment",
+    "Ensuring resilient, secure and scalable ground-up systems",
+];
+
+// ── Inline SVG icons (Material Design, 24×24 viewBox) ─────────────────────
+
+const ICON_ARCHITECTURE: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M2.5 19h19v2h-19v-2zm7.18-1.73 4.35 1.16 6.04-6.04-1.78-1.78-4.35 1.16-2.08-2.09 3.03-5.25-1.77-1.77-5.25 3.02-2.09-2.08 1.16-4.35-1.78-1.78-6.04 6.04 1.16 4.35 2.08 2.09-3.03 5.25 1.77 1.77 5.25-3.02 2.09 2.09z"/></svg>"#;
+
+const ICON_HUB: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>"#;
+
+const ICON_WORK_OUTLINE: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.35C18 2.99 16.64 1.5 14.93 1.5c-1.26 0-2.18.72-2.93 1.5L12 3l-.01-.01C11.18 2.22 10.26 1.5 9.07 1.5 7.36 1.5 6 2.99 6 4.65c0 .47.11.91.18 1.35H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM14.93 3.5c.74 0 1.07.63 1.07 1.15 0 .8-.73 1.69-2 2.35-1.27-.66-2-1.55-2-2.35 0-.52.33-1.15 1.07-1.15h1.86zM8 4.65c0-.52.33-1.15 1.07-1.15h1.86c.74 0 1.07.63 1.07 1.15 0 .8-.73 1.69-2 2.35-1.27-.66-2-1.55-2-2.35zM20 19H4V8h16v11z"/></svg>"#;
+
+const ICON_EDIT_NOTE: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M3 10h11v2H3zm0-2h11V6H3zm0 8h7v-2H3zm11.41-2.83 1.17-1.17 1.42 1.42-1.17 1.17zm.71-3.54 2.12 2.12-5.3 5.3H10v-2.12z"/></svg>"#;
+
+const ICON_CONTACT_MAIL: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M21 8V7l-3 2-3-2v1l3 2zm1-5H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm8-6h-8V6h8v6z"/></svg>"#;
+
+const ICON_MENU: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>"#;
+
+const ICON_CLOSE_X: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>"#;
+
+const ICON_VOLUME_UP: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>"#;
+
+const ICON_VOLUME_OFF: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>"#;
+
+const ICON_INFO: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>"#;
+
+/// Home page / navigation sidebar.
+///
+/// Ported from `Home.tsx`. Key differences:
+/// - MUI components replaced with native HTML + ported CSS (PORT-CSS-1).
+/// - framer-motion replaced with `.page-enter` CSS keyframes (decision #4).
+/// - Sliding nav highlight measured via `document::eval` on `li.onmouseenter`
+///   (Link doesn't expose onmouseenter; hover sits on the li instead).
+/// - Zustand `useAudioStore` → `AudioState` context (rust-dioxus-3/4).
+/// - `MobileMenuContext` → `MobileMenuState` context (rust-dioxus-3/4).
+/// - Header rotation: `use_future` timer (client-only; SSR renders header[0]).
+/// - `useAudioAnalyzer` omitted — feeds the Bevy background (deferred v0.1-bevy).
+///
+/// Per rust-dioxus-2, rust-dioxus-7, rust-dioxus-8, PORT-CSS-1, decision #4.
+#[component]
+pub fn Home() -> Element {
+    let audio = use_audio_state();
+    let mobile_menu = use_mobile_menu();
+
+    // Extract writable signal handles. Signal is Copy so these are independent
+    // handles to the same underlying storage — mutations go through them.
+    let mut is_muted = audio.is_muted;
+    let mut is_hovering = audio.is_hovering;
+    let mut menu_open = mobile_menu.is_open;
+
+    let mut header_idx: Signal<usize> = use_signal(|| 0);
+    let mut highlight: Signal<Option<ItemPos>> = use_signal(|| None);
+    let mut links_open: Signal<bool> = use_signal(|| false);
+
+    // Rotate subtitle every 7 s. use_future is client-only (docs: "will not run
+    // on the server"), so SSR always renders header[0].
+    use_future(move || async move {
+        loop {
+            let _ = document::eval("new Promise(r => setTimeout(r, 7000))")
+                .join::<serde_json::Value>()
+                .await;
+            let next = (*header_idx.peek() + 1) % HEADER_STRINGS.len();
+            header_idx.set(next);
+        }
+    });
+
+    let is_muted_val = *is_muted.read();
+    let is_open_val = *menu_open.read();
+    let current_idx = *header_idx.read();
+    let current_highlight = highlight.read().clone();
+    let links_open_val = *links_open.read();
+
+    rsx! {
+        div {
+            class: "page-enter",
+            onclick: move |_| {
+                let _ = document::eval(
+                    "(function(){var c=window.sharedAudioContext;\
+                     if(c&&c.state==='suspended')c.resume();})()"
+                );
+            },
+
+            div { id: "Home",
+                div { class: "content",
+
+                    // ── Navigation sidebar ─────────────────────────────────────
+                    div {
+                        class: if is_open_val { "menuContainer mobile-open" } else { "menuContainer" },
+
+                        // Mobile-only toggle (hidden at desktop breakpoint via Home.css).
+                        button {
+                            r#type: "button",
+                            class: "mobile-menu-toggle",
+                            aria_expanded: "{is_open_val}",
+                            aria_controls: "mobile-menu-content",
+                            aria_label: if is_open_val { "Collapse menu" } else { "Expand menu" },
+                            onclick: move |_| menu_open.toggle(),
+                            span { dangerous_inner_html: if is_open_val { ICON_CLOSE_X } else { ICON_MENU } }
+                            span { class: "mobile-menu-toggle-label",
+                                if is_open_val { "Close" } else { "Menu" }
+                            }
+                        }
+
+                        div {
+                            id: "mobile-menu-content",
+                            class: "mobile-menu-content",
+
+                            // ── Page links with Halo-style sliding highlight ───
+                            div {
+                                class: "pageLinks",
+                                onmouseleave: move |_| {
+                                    highlight.set(None);
+                                    is_hovering.set(false);
+                                },
+
+                                // Absolutely-positioned highlight bar; CSS handles color/border.
+                                if let Some(ref pos) = current_highlight {
+                                    div {
+                                        class: "nav-highlight",
+                                        style: "top: {pos.top}px; height: {pos.height}px; \
+                                                transition: top 0.2s cubic-bezier(0.22,1,0.36,1), \
+                                                            height 0.1s ease-out; opacity: 1;",
+                                    }
+                                }
+
+                                for (idx, item) in NAV_ITEMS.iter().enumerate() {
+                                    Link {
+                                        to: item.link,
+                                        class: "navbarItem",
+                                        active_class: "active",
+                                        onclick: move |_| {
+                                            if !*is_muted.peek() {
+                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                            }
+                                        },
+                                        li {
+                                            // Hover events on li: Link doesn't expose onmouseenter.
+                                            onmouseenter: move |_| {
+                                                is_hovering.set(true);
+                                                let mut hl = highlight;
+                                                spawn(async move {
+                                                    let js = format!(
+                                                        "(function(){{\
+                                                          var items=document.querySelectorAll(\
+                                                            '#Home .pageLinks .navbarItem');\
+                                                          var el=items[{idx}];\
+                                                          if(!el)return null;\
+                                                          var parent=el.closest('.pageLinks');\
+                                                          if(!parent)return null;\
+                                                          var pr=parent.getBoundingClientRect();\
+                                                          var er=el.getBoundingClientRect();\
+                                                          return{{top:er.top-pr.top,\
+                                                                  height:er.height}};\
+                                                        }})()"
+                                                    );
+                                                    if let Ok(result) = document::eval(&js)
+                                                        .join::<Option<ItemPos>>()
+                                                        .await
+                                                    {
+                                                        hl.set(result);
+                                                    }
+                                                });
+                                                if !*is_muted.peek() {
+                                                    spawn(async move {
+                                                        let _ = document::eval(
+                                                            "new Promise(r=>setTimeout(r,5))"
+                                                        )
+                                                        .join::<serde_json::Value>()
+                                                        .await;
+                                                        play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                    });
+                                                }
+                                            },
+                                            span { class: "listItem",
+                                                dangerous_inner_html: item.icon,
+                                            }
+                                            span { class: "listItem", "{item.text}" }
+                                        }
+                                    }
+                                }
+                            }
+
+                            hr {}
+
+                            // ── Links external-URL dropdown ────────────────────
+                            div { class: "links",
+                                div {
+                                    class: "navbarItem",
+                                    style: "position: relative;",
+                                    li {
+                                        button {
+                                            r#type: "button",
+                                            style: "display: flex; align-items: center; gap: 15px; \
+                                                    width: 100%; background: none; border: none; \
+                                                    cursor: pointer; padding: 0; color: inherit;",
+                                            onmouseenter: move |_| is_hovering.set(true),
+                                            onmouseleave: move |_| is_hovering.set(false),
+                                            onclick: move |_| {
+                                                if !*is_muted.peek() {
+                                                    play_sound("/assets/sounds/select.mp3", 0.45);
+                                                }
+                                                links_open.toggle();
+                                            },
+                                            span { class: "listItem", dangerous_inner_html: ICON_INFO }
+                                            span { class: "listItem", "Links" }
+                                        }
+                                    }
+
+                                    if links_open_val {
+                                        div {
+                                            style: "position: absolute; bottom: 100%; left: 0; \
+                                                    background-color: rgba(8,26,20,0.96); \
+                                                    border-radius: 10px; min-width: 200px; \
+                                                    z-index: 100; padding: 8px 0;",
+                                            onclick: move |_| links_open.set(false),
+                                            for link_item in LINK_ITEMS.iter() {
+                                                a {
+                                                    class: "menuLink",
+                                                    href: link_item.href,
+                                                    target: "_blank",
+                                                    rel: "noopener noreferrer",
+                                                    div {
+                                                        style: "display:flex;align-items:center;\
+                                                                gap:14px;padding:8px 16px;",
+                                                        span { class: "listItem", "{link_item.label}" }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // ── Name + rotating subtitle ───────────────────────────────
+                    div {
+                        class: "textContainer",
+                        style: "text-align: center;",
+                        div {
+                            class: "text",
+                            style: "min-height: 200px; display: flex; flex-direction: column; \
+                                    justify-content: center; align-items: center;",
+                            h1 { class: "name-fade-in", style: "text-align: center;",
+                                "Zachary Ernst"
+                            }
+                            div {
+                                style: "position: relative; height: 40px; width: 100%; \
+                                        display: flex; justify-content: center;",
+                                // Re-keyed on index change → CSS fade-in re-fires each rotation.
+                                h3 {
+                                    key: "{current_idx}",
+                                    class: "header-fade-in",
+                                    style: "position: absolute; text-align: center; \
+                                            margin: 0; width: 100%;",
+                                    "{HEADER_STRINGS[current_idx]}"
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── Mute toggle (fixed, bottom-right) ──────────────────────────
+                div {
+                    style: "position: fixed; bottom: 30px; right: 30px; \
+                            z-index: 1000; pointer-events: auto;",
+                    button {
+                        r#type: "button",
+                        aria_label: "Toggle Mute",
+                        style: "background-color: rgba(15,23,42,0.4); border: none; \
+                                border-radius: 50%; padding: 8px; cursor: pointer; \
+                                color: rgb(240,240,240); display: flex; align-items: center; \
+                                justify-content: center;",
+                        onclick: move |_| {
+                            let _ = document::eval(
+                                "(function(){var c=window.sharedAudioContext;\
+                                 if(c&&c.state==='suspended')c.resume();})()"
+                            );
+                            is_muted.toggle();
+                        },
+                        span {
+                            dangerous_inner_html: if is_muted_val { ICON_VOLUME_OFF } else { ICON_VOLUME_UP },
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
