@@ -6,6 +6,9 @@ use crate::components;
 pub enum Route {
     #[route("/")]
     Home {},
+    // Legacy alias — mirrors React's <Navigate to="/" replace />.
+    #[route("/home")]
+    HomeAlias {},
     #[route("/start")]
     StartingScreen {},
     #[route("/manifesto")]
@@ -16,13 +19,19 @@ pub enum Route {
     Credentials {},
     #[route("/work")]
     ProfessionalExperience {},
+    // Legacy alias — mirrors React's <Navigate to="/work" replace />.
+    #[route("/professional-experience")]
+    ProfessionalExperienceAlias {},
     #[route("/writing")]
     Writing {},
     #[route("/contactme")]
     ContactMe {},
-    // Catch-all — renders NotFound for any unmatched path.
+    // Explicit 404 page — mirrors React's <Route path="/404" element={<NotFound />} />.
+    #[route("/404")]
+    NotFoundPage {},
+    // Catch-all redirects to /404 — mirrors React's <Navigate to="/404" replace />.
     #[route("/:..segments")]
-    NotFound { segments: Vec<String> },
+    RedirectToNotFound { segments: Vec<String> },
 }
 
 // Thin wrappers that bridge Route variants → component module.
@@ -31,6 +40,15 @@ pub enum Route {
 #[component]
 fn Home() -> Element {
     rsx! { components::Home {} }
+}
+
+#[component]
+fn HomeAlias() -> Element {
+    let nav = use_navigator();
+    use_effect(move || {
+        nav.replace(Route::Home {});
+    });
+    rsx! {}
 }
 
 #[component]
@@ -59,6 +77,15 @@ fn ProfessionalExperience() -> Element {
 }
 
 #[component]
+fn ProfessionalExperienceAlias() -> Element {
+    let nav = use_navigator();
+    use_effect(move || {
+        nav.replace(Route::ProfessionalExperience {});
+    });
+    rsx! {}
+}
+
+#[component]
 fn Writing() -> Element {
     rsx! { components::Writing {} }
 }
@@ -69,7 +96,16 @@ fn ContactMe() -> Element {
 }
 
 #[component]
-fn NotFound(segments: Vec<String>) -> Element {
-    let _ = segments;
+fn NotFoundPage() -> Element {
     rsx! { components::NotFound {} }
+}
+
+#[component]
+fn RedirectToNotFound(segments: Vec<String>) -> Element {
+    let _ = segments;
+    let nav = use_navigator();
+    use_effect(move || {
+        nav.replace(Route::NotFoundPage {});
+    });
+    rsx! {}
 }
