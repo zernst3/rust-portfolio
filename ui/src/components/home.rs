@@ -120,11 +120,13 @@ pub fn Home() -> Element {
 
     // Rotate subtitle every 7 s. use_future is client-only (docs: "will not run
     // on the server"), so SSR always renders header[0].
+    // dioxus.send() is required to resolve eval.await — a bare Promise.resolve
+    // or setTimeout(r, ms) without calling dioxus.send() blocks forever.
     use_future(move || async move {
         loop {
-            let _ = document::eval("new Promise(r => setTimeout(r, 7000))")
-                .join::<serde_json::Value>()
-                .await;
+            document::eval("setTimeout(function(){dioxus.send(null)},7000)")
+                .await
+                .ok();
             let next = (*header_idx.peek() + 1) % HEADER_STRINGS.len();
             header_idx.set(next);
         }
@@ -205,18 +207,21 @@ pub fn Home() -> Element {
                                                 is_hovering.set(true);
                                                 let mut hl = highlight;
                                                 spawn(async move {
+                                                    // dioxus.send() required — eval.await blocks
+                                                    // until JS calls dioxus.send(). `return` alone
+                                                    // does not resolve the Rust future.
                                                     let js = format!(
                                                         "(function(){{\
                                                           var items=document.querySelectorAll(\
                                                             '#Home .pageLinks .navbarItem');\
                                                           var el=items[{idx}];\
-                                                          if(!el)return null;\
+                                                          if(!el){{dioxus.send(null);return;}}\
                                                           var parent=el.closest('.pageLinks');\
-                                                          if(!parent)return null;\
+                                                          if(!parent){{dioxus.send(null);return;}}\
                                                           var pr=parent.getBoundingClientRect();\
                                                           var er=el.getBoundingClientRect();\
-                                                          return{{top:er.top-pr.top,\
-                                                                  height:er.height}};\
+                                                          dioxus.send({{top:er.top-pr.top,\
+                                                                        height:er.height}});\
                                                         }})()"
                                                     );
                                                     if let Ok(result) = document::eval(&js)
@@ -228,11 +233,12 @@ pub fn Home() -> Element {
                                                 });
                                                 if !*is_muted.peek() {
                                                     spawn(async move {
-                                                        let _ = document::eval(
-                                                            "new Promise(r=>setTimeout(r,5))"
+                                                        // Same fix: dioxus.send() after 5 ms.
+                                                        document::eval(
+                                                            "setTimeout(function(){dioxus.send(null)},5)"
                                                         )
-                                                        .join::<serde_json::Value>()
-                                                        .await;
+                                                        .await
+                                                        .ok();
                                                         play_sound("/assets/sounds/woosh3.mp3", 0.25);
                                                     });
                                                 }

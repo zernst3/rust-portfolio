@@ -405,6 +405,7 @@ fn PickerItem(props: PickerItemProps) -> Element {
     rsx! {
         div {
             class: "{class}",
+            style: "cursor: pointer; padding: 15px 10px; position: relative; z-index: 1;",
             "data-exp-key": "{key}",
             onclick: move |_| props.on_select.call(key),
             onmouseenter: move |_| props.on_hover.call(key),
