@@ -1,0 +1,149 @@
+#ManifestoContainer {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  overflow: hidden;
+  /* Prevent page-level scroll */
+}
+
+#ManifestoInnerContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  /* Inner scroll only */
+  padding-bottom: 100px;
+  /* Room for Back button */
+}
+
+#ManifestoInnerContainer h1 {
+  font-size: clamp(2rem, 10vw, 3.5rem);
+  color: #F0F0F0;
+  margin-top: clamp(2rem, 8vw, 5rem);
+  margin-bottom: clamp(1.5rem, 6vw, 3rem);
+  /* Site-wide Aldrich on headings (inherits from index.css h1 rule); keep
+     this rule for the other heading-specific styling. */
+  text-align: center;
+}
+
+/* --- Thread layout: a vertical spine with glowing nodes per statement --- */
+.manifesto-thread {
+  position: relative;
+  width: 90%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.thread-line {
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--blue-mid), 0) 0%,
+    rgba(var(--blue-mid), 0.45) 10%,
+    rgba(var(--blue-mid), 0.45) 90%,
+    rgba(var(--blue-mid), 0) 100%
+  );
+  overflow: hidden;
+}
+
+.thread-pulse {
+  position: absolute;
+  left: -2px;
+  width: 6px;
+  height: 110px;
+  background: linear-gradient(to bottom, transparent, rgb(var(--blue-bright)), transparent);
+  filter: drop-shadow(0 0 6px rgb(var(--blue-bright)));
+  opacity: 0;
+  animation: thread-travel 7s ease-in-out infinite;
+}
+
+@keyframes thread-travel {
+  0% { top: -110px; opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.story-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  position: relative;
+}
+
+.story-block {
+  position: relative;
+  padding-left: 52px;
+  text-align: left;
+}
+
+.thread-node {
+  position: absolute;
+  left: 7px;
+  top: 0.7rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgb(var(--blue-darker));
+  border: 2px solid rgb(var(--blue-bright));
+  box-shadow: 0 0 8px rgba(var(--blue-bright), 0.45);
+}
+
+.story-block p {
+  font-size: clamp(1.1rem, 2.4vw, 1.9rem);
+  line-height: 1.6;
+  color: #F0F0F0;
+  /* Site-wide Rajdhani on body text (inherits from index.css body rule). */
+  font-weight: 300;
+  margin: 0;
+}
+
+.story-block .flair {
+  color: rgb(var(--blue-bright));
+  font-weight: bold;
+}
+
+.story-block em {
+  color: #F0F0F0;
+  font-style: italic;
+  border-bottom: 1px solid rgba(var(--blue-bright), 0.6);
+}
+
+@media only screen and (max-width: 1050px) {
+  #ManifestoInnerContainer h1 {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .story-container {
+    gap: 2.25rem;
+  }
+
+  .story-block {
+    padding-left: 40px;
+  }
+
+  .story-block p {
+    font-size: 1.3rem;
+  }
+
+  .thread-line {
+    left: 10px;
+  }
+
+  .thread-node {
+    left: 3px;
+    width: 14px;
+    height: 14px;
+  }
+}

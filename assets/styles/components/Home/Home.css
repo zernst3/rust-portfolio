@@ -1,0 +1,361 @@
+#Home {
+  position: fixed;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 5px;
+  height: 100dvh;
+  width: 100vw;
+  /* hidden (not auto): short screens are handled by the squish media
+     queries below, not scrolling — the page is a fixed-viewport stage. */
+  overflow: hidden;
+}
+
+#Home .content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  /* nowrap (not wrap-reverse): between 1333px and ~1444px the menu (max
+     600px) + text (700px) = 1300px just barely exceed the 90%-width row,
+     which previously wrapped them into a stack that overflowed the top
+     (clipping the name) on shorter viewports like a Retina 16:10 Mac
+     (~1440x780 CSS px). nowrap lets the two columns shrink a few px to
+     stay side-by-side instead, keeping the name bottom-right. Below
+     1333px the media query switches to an intentional centered column. */
+  flex-wrap: nowrap;
+  width: 90%;
+}
+
+/* MENU */
+
+#Home .menuContainer {
+  height: 75%;
+  max-height: 600px;
+  width: auto;
+
+  width: 95%;
+  max-width: 600px;
+  background-color: rgba(41, 70, 70, 0.5);
+  border-radius: 2px;
+}
+
+#Home .menuContainer hr {
+  width: 100%;
+  margin: 0px 0px;
+  border: 0;
+  height: 2px;
+  background-image: linear-gradient(to left,
+      rgba(117, 117, 117, 0),
+      rgba(117, 117, 117, 0.75),
+      rgba(117, 117, 117, 0));
+}
+
+#Home .menuContainer a li,
+#Home .menuContainer div li {
+  padding: 0 20px;
+  /* Compressed from 75px to fit the 5th menu item (AI Architecture) within
+     the menu container without overflowing into the title above. */
+  height: 60px;
+  margin: 3px 0px;
+  width: 100%;
+  /* Only animate the hover background fade — never `transition: all`. The
+     `all` keyword animates any changeable property, which can pick up
+     unintended cascading changes (opacity, color, etc.) when ancestor
+     classes change and cause spurious mid-animation layout effects. */
+  transition: background 0.5s linear;
+  /* Tight line-height so that when an item label wraps (e.g.
+     "Professional Experience" on narrow viewports), the two words
+     read as ONE item rather than as two items with an outsized
+     gap between them. The inter-item margin (3px) must stay larger
+     than the inter-line gap. */
+  line-height: 1.05;
+  display: flex;
+  align-items: center;
+}
+
+/* The Links dropdown trigger keeps the simple CSS hover fill. The main
+   menu (.pageLinks) uses the sliding bar below instead. */
+#Home .menuContainer .links div li:hover {
+  background: linear-gradient(90deg,
+      rgba(194, 167, 46, 0.7) 0%,
+      rgba(189, 157, 86, 0.5) 51%,
+      rgba(179, 164, 96, 0.3) 100%);
+}
+
+#Home .menuContainer a,
+#Home .menuContainer div {
+  text-decoration: none;
+  position: relative;
+}
+
+/* #1 Sliding selection bar — a single highlight that travels between items */
+#Home .pageLinks {
+  position: relative;
+}
+
+#Home .pageLinks .nav-highlight {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 2px;
+  /* Warm amber bar with a bright leading edge — the lone warm element in
+     the cool green field, a nod to Halo's orange-on-blue selection. */
+  background: linear-gradient(90deg,
+      rgba(194, 167, 46, 0.7) 0%,
+      rgba(189, 157, 86, 0.45) 51%,
+      rgba(179, 164, 96, 0.18) 100%);
+  border-left: 2px solid rgba(224, 204, 128, 0.9);
+}
+
+#Home .pageLinks a.navbarItem {
+  z-index: 1;
+}
+
+#Home .menuContainer div button {
+  text-align: left;
+  width: 100%;
+  background: none;
+  padding: 0;
+}
+
+#Home .menuContainer a *,
+#Home .menuContainer div button * {
+  color: rgb(var(--text-primary));
+  font-size: 1.5rem;
+  /* Rajdhani (secondary site font, SIL Open Font License) on the menu
+     items so the home page has clear typographic hierarchy:
+       - The name (h1) is the Aldrich showcase
+       - Menu items + body sit underneath in the quieter Rajdhani
+     The amber sliding selection bar carries the Halo-inspired punch on
+     this surface; the menu text doesn't need to compete with Aldrich
+     boldness next to the title. */
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  /* Tight line-height so that when an item label wraps (e.g.
+     "Professional Experience" on narrow viewports), the two
+     words read as ONE item rather than as two items with an
+     outsized gap between them. Applied at the descendant level
+     because MUI's ListItemText injects its own line-height on
+     the .MuiListItemText-primary span and would otherwise
+     override an li-level rule. */
+  line-height: 1.05;
+}
+
+.links {
+  margin: 10% 0;
+}
+
+/* TEXT */
+
+#Home .textContainer {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  padding-bottom: 5%;
+  width: 700px;
+}
+
+#Home .textContainer .text {
+  padding-left: 10px;
+}
+
+#Home .textContainer h1 {
+  color: rgb(240, 240, 240);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  margin: 5px;
+  /* Aldrich — same display font as the menu items, applied to the
+     most prominent text on the page (the name). The name is the
+     visual showcase of the font, the same way "HALO" plays that role
+     in the Halo main menu — the menu items follow the same family
+     for visual coherence. Subheader (h3) and body text stay in their
+     existing fonts; selective use is the principle. */
+  font-family: "Aldrich", sans-serif;
+  letter-spacing: 1px;
+}
+
+#Home .textContainer h3 {
+  color: rgb(240, 240, 240);
+  font-size: clamp(1rem, 3vw, 2rem);
+  margin: 5px;
+  /* Rajdhani — secondary display font, leans Halo / geometric but more
+     subtle than Aldrich. Used here for the role-rotation subheader: it
+     reads as a quieter companion to the name above it, providing
+     hierarchy without two display fonts competing. Same SIL Open Font
+     License family as Aldrich. */
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+@media only screen and (max-width: 1333px) {
+  /* #Home prefix is load-bearing: the base rule is `#Home .content`
+     (specificity 0,1,1). A bare `.content` here (0,1,0) loses the cascade,
+     so flex-direction never flipped to column — the old wrap-reverse faked
+     the stack by wrapping the row. With nowrap that fake stack is gone, so
+     this rule MUST match the base specificity to actually apply the column
+     layout on tablet/mobile. */
+  #Home .content {
+    margin: auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  #Home .textContainer {
+    order: 1;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    padding-bottom: 2%;
+    align-items: center;
+  }
+
+  #Home .menuContainer {
+    order: 2;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    max-height: none;
+  }
+
+  /* Applied the spacious menu layout to all stacked views, not just tiny phones */
+  #Home .menuContainer a li,
+  #Home .menuContainer div li {
+    height: 60px;
+    margin: 15px 0px;
+    padding: 0 10px;
+  }
+}
+
+@media only screen and (max-width: 670px) {
+  /*
+     On mobile, the menuContainer reserves layout space for the
+     expanded menu (so the title text below it doesn't reflow). When
+     the menu is collapsed the container is visually transparent so
+     only the toggle button reads as UI; when expanded the
+     background fades in alongside the menu content. Matches the
+     content's opacity timing for a coherent single-motion feel.
+  */
+  #Home .menuContainer {
+    background-color: rgba(41, 70, 70, 0);
+    transition: background-color 0.28s ease-out;
+  }
+
+  #Home .menuContainer.mobile-open {
+    background-color: rgba(41, 70, 70, 0.3);
+  }
+
+  #Home .textContainer {
+    width: 90%;
+  }
+
+  #Home .textContainer h1 {
+    font-size: clamp(2.2rem, 11vw, 3.8rem);
+  }
+
+  #Home .textContainer h3 {
+    font-size: clamp(1rem, 4.5vw, 1.6rem);
+  }
+}
+
+/* ---- Mobile menu collapse ---- */
+/*
+   The mobile-menu-toggle button is hidden by default (desktop / tablet
+   widths) and shown only at mobile widths. On mobile the menu content
+   starts collapsed but the menuContainer reserves the full expanded
+   height so the title text below it stays anchored in one position
+   regardless of whether the menu is open or closed. The menu content
+   fades + slides in/out within that fixed envelope.
+*/
+
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media only screen and (max-width: 670px) {
+
+  /* Tight, symmetric vertical margin on the .links section so the
+     space above the Links dropdown trigger matches the space below.
+     The default 10% margin from the desktop rule is far too generous
+     at mobile scale. */
+  #Home .menuContainer .links {
+    margin: 10px 0;
+  }
+
+  /* The toggle is the always-visible affordance on mobile */
+  .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    appearance: none;
+    border: 1px solid rgba(var(--text-primary), 0.2);
+    background-color: rgba(41, 70, 70, 0.6);
+    color: rgb(var(--text-primary));
+    /* Rajdhani for consistency with the menu items it toggles. */
+    font-family: "Rajdhani", sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+    padding: 10px 16px;
+    margin: 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.2s linear, border-color 0.2s linear;
+    align-self: flex-start;
+  }
+
+  .mobile-menu-toggle:hover {
+    background-color: rgba(41, 70, 70, 0.85);
+    border-color: rgba(240, 240, 240, 0.4);
+  }
+
+  .mobile-menu-toggle-label {
+    text-transform: uppercase;
+  }
+
+  /* The menu content stays in the DOM at all times (so it reserves
+     layout space and the title below doesn't shift). When collapsed
+     it's fully transparent, slightly translated up, and not interactive.
+     When opened, it fades + slides down to its natural position. */
+  #Home .menuContainer .mobile-menu-content {
+    opacity: 0;
+    transform: translateY(-16px);
+    pointer-events: none;
+    transition:
+      opacity 0.28s ease-out,
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  #Home .menuContainer.mobile-open .mobile-menu-content {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Height-based squishing for landscape mobile or short screens (like Nest Hub) */
+@media only screen and (max-height: 700px) and (max-width: 1333px) {
+
+  #Home .menuContainer a li,
+  #Home .menuContainer div li {
+    height: 40px !important;
+    margin: 5px 0px !important;
+  }
+}
+
+/* When the menu gets narrow enough that "Professional Experience"
+   wraps to two lines, add extra vertical breathing room between
+   items so the wrapped item doesn't visually crowd its neighbors.
+   !important wins against the short-screen rule above so this still
+   applies on small phones in portrait (e.g. 375×667). */
+@media only screen and (max-width: 480px) {
+
+  #Home .menuContainer a li,
+  #Home .menuContainer div li {
+    margin: 14px 0px !important;
+  }
+}

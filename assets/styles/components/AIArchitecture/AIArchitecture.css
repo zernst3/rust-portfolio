@@ -1,0 +1,367 @@
+/* ────────────────────────────────────────────────────────────────────
+   AI Architecture page — Halo 3 HUD-flavored palette using the site's
+   global blue variables (defined in index.css):
+     --blue-darker  → tile / focused-panel BACKGROUNDS (darker than
+                      --blue-deep so the tiles read as their own layer
+                      distinct from larger surfaces using --blue-deep,
+                      e.g., the SingleExperience mobile overlay)
+     --blue-mid     → tile borders + accent text + tile-icon color
+     --blue-bright  → hover states + focused-panel title + human-card
+                      accent + back-button hover
+   Sharp 2px corners, soft glow on hover. Aldrich on titles, default
+   body font on prose.
+   ──────────────────────────────────────────────────────────────────── */
+
+#AIArchitectureContainer {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  overflow: hidden;
+  /* Prevent page-level scroll — matches Manifesto/Credentials pattern */
+  color: rgb(var(--text-primary));
+  z-index: 10;
+}
+
+#AIArchitectureInnerContainer {
+  flex: 1 1 auto;
+  min-height: 0;
+  /* flex sizing (not height: 100%) so the sibling Close button gets
+     its own flex space at the bottom — height: 100% would consume the
+     whole viewport and overflow: hidden on the container would clip
+     Close, particularly on short mobile viewports. */
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Suppress any rogue horizontal scroll from grid items / borders. */
+  padding: 4rem 2rem 2rem;
+  box-sizing: border-box;
+}
+
+#AIArchitectureInnerContainer h1 {
+  font-family: "Aldrich", sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgb(var(--blue-mid));
+  margin: 0 0 1rem 0;
+  text-shadow: 0 0 12px rgba(var(--blue-mid),0.3);
+}
+
+.intro {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 880px;
+  margin: 0 0 3rem 0;
+  color: rgba(var(--text-primary),0.82);
+}
+
+/* ── Stage / focused state container ──────────────────────────────── */
+
+.ai-arch-stage {
+  position: relative;
+}
+
+/* ── Grid of tiles (overview state) ────────────────────────────────── */
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.tile {
+  /* Reset button styling */
+  appearance: none;
+  border: 1px solid rgba(var(--blue-mid),0.35);
+  background-color: rgba(var(--blue-darker),0.55);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  box-sizing: border-box;
+
+  padding: 1.5rem 1.5rem 1.75rem;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 180px;
+  min-width: 0;
+  /* min-width: 0 prevents grid items from blowing out their column
+     when their intrinsic content (e.g. long text without breaks)
+     is wider than the grid track. */
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.tile:hover {
+  border-color: rgba(var(--blue-bright),0.7);
+  background-color: rgba(var(--blue-darker),0.7);
+  box-shadow: 0 0 24px rgba(var(--blue-mid),0.18);
+}
+
+.tile:focus-visible {
+  outline: 2px solid rgb(var(--blue-bright));
+  outline-offset: 3px;
+}
+
+.tile-icon {
+  color: rgb(var(--blue-mid));
+  display: flex;
+  align-items: center;
+}
+
+.tile-icon .MuiSvgIcon-root {
+  font-size: 2rem;
+}
+
+.tile-title {
+  margin: 0;
+  font-family: "Aldrich", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgb(var(--blue-mid));
+}
+
+.tile-summary {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(var(--text-primary),0.78);
+}
+
+/* ── Human-in-the-loop card ────────────────────────────────────────── */
+/*
+   Spans the full width across the grid bottom (grid-column: 1 / -1).
+   Visually distinct from the tiles so the role of the human reads at
+   a glance: the loop closure, not a peer to the layers above.
+*/
+
+.human-card {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px dashed rgba(var(--blue-bright), 0.5);
+  background-color: rgba(var(--blue-darker), 0.4);
+  border-radius: 2px;
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.human-icon {
+  color: rgb(var(--blue-bright));
+  font-size: 2.25rem !important;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.human-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.human-label {
+  font-family: "Aldrich", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgb(var(--blue-bright));
+}
+
+.human-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(var(--text-primary),0.82);
+}
+
+/* ── Focused tile (detail state) ───────────────────────────────────── */
+/*
+   Absolute-positioned overlay on top of the (still-mounted but
+   faded) grid. Without this, the focused panel would sit BELOW the
+   invisible grid in the inner container's scroll flow.
+*/
+
+.tile-focused {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  border: 1px solid rgba(var(--blue-bright), 0.55);
+  background-color: rgba(var(--blue-darker), 0.6);
+  border-radius: 2px;
+  padding: 2rem 2.25rem 2.5rem;
+  box-shadow: 0 0 40px rgba(var(--blue-mid),0.2);
+
+  /* Constrain width so the focused panel feels purposeful, not just
+     a stretched tile. */
+  max-width: 920px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.tile-focused-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(var(--blue-mid),0.25);
+}
+
+.tile-icon-large .MuiSvgIcon-root {
+  font-size: 2.6rem;
+}
+
+.tile-focused-title {
+  margin: 0;
+  font-family: "Aldrich", sans-serif;
+  font-size: 1.7rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgb(var(--blue-bright));
+  flex: 1;
+}
+
+.back-button {
+  appearance: none;
+  background-color: transparent;
+  color: rgb(var(--blue-mid));
+  border: 1px solid rgba(var(--blue-mid),0.5);
+  padding: 0.5rem 1.25rem;
+  font-family: "Aldrich", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  border-color: rgb(var(--blue-bright));
+  color: rgb(var(--blue-bright));
+  box-shadow: 0 0 12px rgba(var(--blue-bright),0.3);
+}
+
+.tile-focused-summary {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(var(--text-primary),0.9);
+  font-style: italic;
+}
+
+.tile-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tile-detail-list li {
+  padding: 1rem 1.25rem;
+  border-left: 2px solid rgba(var(--blue-mid), 0.5);
+  background-color: rgba(var(--blue-darker), 0.4);
+  border-radius: 0 2px 2px 0;
+  box-sizing: border-box;
+}
+
+.tile-detail-list h3 {
+  margin: 0 0 0.5rem 0;
+  font-family: "Aldrich", sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgb(var(--blue-mid));
+}
+
+.tile-detail-list p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(var(--text-primary),0.82);
+}
+
+/* ── Responsive adjustments ────────────────────────────────────────── */
+
+@media (max-width: 1050px) {
+  #AIArchitectureInnerContainer {
+    padding: 3rem 1.5rem 1.5rem;
+  }
+
+  #AIArchitectureInnerContainer h1 {
+    font-size: 2rem;
+  }
+
+  .tile-focused {
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
+  .tile-focused-title {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 720px) {
+  #AIArchitectureInnerContainer {
+    padding: 2rem 1rem 1.5rem;
+    /* Slight side margin only — let tiles take the rest of the page
+       width so the page reads centered on phones. */
+  }
+
+  #AIArchitectureInnerContainer h1 {
+    font-size: 1.7rem;
+    letter-spacing: 0.3px;
+  }
+
+  .intro {
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .tile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .tile {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .human-card {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+  }
+
+  .tile-focused-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tile-focused-title {
+    font-size: 1.15rem;
+    flex: 1 1 100%;
+    order: -1;
+  }
+
+  .back-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,124 @@
+:root {
+  /*
+    Global blue palette — site-wide brand color.
+    Anchored on #073757 (the teal-blue layer used in SingleExperience.css
+    mobile view). All other shades are lighter derivatives of the same
+    hue, kept consistent so any blue accent / border / hover state on any
+    page traces back to one source of truth.
+
+    Stored as raw R, G, B triplets so they can be used inside rgba() with
+    arbitrary alpha: rgba(var(--blue-deep), 0.5)
+  */
+  --blue-deep: 7, 55, 87;       /* #073757 — base teal-blue brand color (large surfaces: mobile overlay, etc.) */
+  --blue-darker: 3, 28, 52;     /* #031C34 — pure dark blue (no teal) for diagram / tile BACKGROUNDS, kept visually distinct from --blue-deep surfaces. */
+  --blue-mid: 30, 90, 140;      /* #1E5A8C — mid teal, used for borders */
+  --blue-bright: 78, 160, 220;  /* #4EA0DC — brightest, used for hover / icons */
+
+  /*
+    Global text color — site-wide white-cream used on dark backgrounds.
+    Stored as an R, G, B triplet so it can be used inside rgba() with
+    arbitrary alpha for hierarchy (lower alpha = quieter secondary text).
+  */
+  --text-primary: 240, 240, 240;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  /* Blueprint Navy move to Background3D fixed container */
+  color: #F0F0F0;
+  /* Rajdhani — secondary display font, applied site-wide to all body /
+     prose / supporting text. Geometric, Halo-adjacent, more subtle than
+     Aldrich. SIL Open Font License. */
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Aldrich — primary display font, applied site-wide to ALL headings and
+   titles. Geometric, military-tech feel, Halo HUD-adjacent. SIL Open Font
+   License. The name on the home page is the visual showcase application;
+   every other h1-h6 follows for site-wide consistency. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Aldrich", sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Subpage Readability Overlay
+   ----------------------------
+   Any subpage navigated to from the home navbar should opt into this
+   overlay so prose is legible against the live 3D background. The
+   canonical way to opt in for new subpages is to add the
+   `.subpage-overlay` class to the page's outer container. The legacy
+   IDs are kept here so existing pages continue working without churn;
+   new pages should prefer the class. */
+.subpage-overlay,
+#ContactMeContainer,
+#StartingScreenContainer,
+#NotFoundContainer,
+#ProfessionalExperienceContainer,
+#ManifestoContainer,
+#EducationAndWorkContainer,
+#AIArchitectureContainer,
+#WritingContainer {
+  /* Opaque readability layer instead of backdrop-filter: a full-viewport
+     backdrop blur re-rasterizes the live 3D canvas every scroll frame,
+     which is the main source of modal scroll-lag. A solid dark tint reads
+     the same and costs nothing per frame. */
+  background-color: rgba(0, 8, 6, 0.82);
+  z-index: 10;
+  /* GPU compositing: promote this overlay to its own layer so the
+     browser doesn't have to recomposite a translucent full-viewport
+     rectangle against the live 3D canvas on every frame. Load-bearing
+     for scroll/animation perf; do not remove without an alternative. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity;
+}
+
+/* * {
+  font-family: "JetBrains Mono", monospace;
+} */
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+#root {
+  /* dvh — track live visible viewport so the app sizes to the actually
+     visible area on mobile (URL bar collapsing/expanding). vh resolves
+     to the large viewport, which makes content overflow behind the
+     mobile chrome bar until the user scrolls past it. */
+  height: 100dvh;
+}
+
+*::-webkit-scrollbar {
+  width: 1em;
+}
+
+*::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #0a1f1c;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(158, 158, 158, 0.5);
+  border: 1px solid slategrey;
+  border-radius: 10px;
+}
+
+/* In-paragraph emphasis color for highlighted terms (e.g. role names,
+   acquisitions, key phrases). Class name predates the blue palette; kept
+   to avoid touching every callsite, but the value now points at the
+   lightest blue from the global palette for consistency with the rest
+   of the accent system. */
+.green-text {
+  color: rgb(var(--blue-bright));
+}

@@ -1,0 +1,25 @@
+#Accordion {
+  width: 100%;
+  /* height: 33%; */
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#Accordion header {
+  text-align: center;
+  font-size: 1.7em;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  height: 35px;
+  width: 100%;
+  max-width: 250px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+#Accordion section {
+  width: 100%;
+}

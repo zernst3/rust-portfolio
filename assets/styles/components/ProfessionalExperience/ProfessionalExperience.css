@@ -1,0 +1,718 @@
+#ProfessionalExperienceContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+}
+
+/* #ProfessionalExperienceContainer * {
+  margin-top: auto;
+  margin-bottom: auto;
+} */
+
+#ProfessionalExperienceInnerContainer {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  overflow: auto;
+
+  /* ===== WIDTH-LOCK FIX, PART 2 (do not regress) =====
+     The InnerContainer is a flex item of #ProfessionalExperienceContainer
+     which uses `align-items: center`. Without an explicit width, the
+     InnerContainer sizes to its CONTENT (not to the parent), so any
+     change in the picker/preview content's intrinsic width causes the
+     whole container to resize, which cascades to the grid columns
+     inside ProfessionalExperienceContent. The CSS Grid fix locks the
+     50/50 SPLIT inside the container, but the container itself must
+     also have a locked width. Explicit width: 100% forces it to fill
+     the parent regardless of content. */
+  width: 100%;
+  box-sizing: border-box;
+  height: 90%;
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+#ProfessionalExperienceContainer h1 {
+  font-size: clamp(2rem, 8vw, 3em);
+  color: rgb(var(--text-primary));
+  align-self: center;
+}
+
+#ProfessionalExperienceInnerContainer>h3 {
+  color: rgb(185, 185, 185);
+  margin-bottom: 10px;
+  align-self: center;
+}
+
+#ProfessionalExperienceContent {
+  /* ===== WIDTH-LOCK FIX (do not regress) =====
+     This column split MUST use CSS Grid, not flexbox. The previous
+     flexbox version (display: flex + .picker/.preview both at flex: 0
+     0 50% + min-width: 0) cannot guarantee a true 50/50 split: when a
+     descendant of .preview contains an unbreakable run (a link
+     without internal break points, a long word, or an image with a
+     wide intrinsic size), the flex item's effective min-content
+     overrides flex-basis, the preview grows, and the picker shrinks,
+     causing the picker items to wrap unpredictably. Gemini and
+     Claude both spent multiple sessions chasing this. The flex
+     spec genuinely permits this behavior, so it is not a browser
+     bug.
+
+     CSS Grid with `grid-template-columns: 1fr 1fr` sizes the columns
+     based on the GRID CONTAINER's width, not on the children's
+     content. The children get exactly 50/50 regardless of what is
+     inside them. Combined with `min-width: 0` on each child to allow
+     content to shrink and overflow-hidden to clip anything still
+     wider, this is the load-bearing fix. If you are tempted to
+     switch back to flexbox here, read this comment first. */
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+#ProfessionalExperienceContent .picker {
+  /* Grid item: column track is set by the parent's grid-template-columns
+     (1fr). width/flex are belt-and-suspenders for browsers that may
+     still respect them, but the grid track is authoritative. */
+  width: 100%;
+  min-width: 0; /* Allow content to shrink below min-content so the
+                   grid track's explicit 1fr basis holds. */
+  height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Use inner scroll container */
+}
+
+.picker-scroll-container {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Sliding selection bar — same Halo-style amber highlight as the home menu.
+   Rests on the selected experience and previews whatever you hover. */
+.picker-highlight {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 5px;
+  background: linear-gradient(90deg,
+      rgba(194, 167, 46, 0.7) 0%,
+      rgba(189, 157, 86, 0.45) 51%,
+      rgba(179, 164, 96, 0.18) 100%);
+  border-left: 2px solid rgba(224, 204, 128, 0.9);
+}
+
+.experience-group {
+  margin-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top-level bucket header (Credentials, Independent Work). Sits above
+   one or more experience-groups and reads as a section divider, not as
+   an entity. Higher visual weight than experience-header-picker so the
+   two-bucket structure is legible at a glance. */
+.bucket-header {
+  width: 100%;
+  align-self: center;
+  margin: 0 0 2rem 0;
+  padding: 0 0 0.6rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(var(--text-primary), 0.7);
+  border-bottom: 1px solid rgba(var(--text-primary), 0.18);
+  pointer-events: none;
+}
+
+.bucket-header + .experience-group {
+  margin-top: 0;
+}
+
+.experience-header-picker {
+  width: 100%;
+  align-self: center;
+  margin-bottom: 2rem;
+  pointer-events: none;
+  /* Header is purely informational */
+}
+
+/* Live product link — re-enable pointer events (the header disables them) */
+.experience-header-picker .live-link {
+  pointer-events: auto;
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: rgb(var(--blue-mid));
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+
+.experience-header-picker .live-link:hover {
+  color: rgb(var(--blue-bright));
+  text-decoration: underline;
+}
+
+#ProfessionalExperienceContent .preview {
+  /* Grid item: column track is set by parent's grid-template-columns
+     (1fr). See WIDTH-LOCK FIX comment above. */
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-width: 900px;
+  /* Ultrawide constraint */
+  padding: 20px 2rem 20px 20px;
+  box-sizing: border-box;
+  overflow: hidden; /* Clip any content that still tries to exceed 1fr */
+}
+
+.center {
+  text-align: center;
+  align-self: center;
+}
+
+.picker h3 {
+  font-size: 1.4em;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.8s;
+}
+
+#ProfessionalExperienceContent .picker a {
+  align-self: center;
+  width: 90%;
+  text-decoration: none;
+  font-size: 1.5em;
+  color: rgb(158, 158, 158);
+  background-color: transparent;
+  outline: none;
+  transition: color 0.4s;
+  padding: 15px 10px;
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  /* Sit above the sliding highlight bar */
+  position: relative;
+  z-index: 1;
+}
+
+/* Picker Header Details (Resume Style) */
+.experience-header-picker .header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 1.55rem;
+  font-weight: bold;
+  color: rgb(var(--text-primary));
+  line-height: 1.2;
+}
+
+.experience-header-picker .entity-name {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+.header-icon-svg {
+  width: 24px;
+  height: 24px;
+  filter: invert(1) brightness(0.8);
+  /* Make SVGs visible on dark bg if they are black */
+}
+
+.experience-header-picker .dots {
+  flex-grow: 1;
+  border-bottom: 2px dotted rgba(var(--text-primary), 0.2);
+  margin: 0 1rem;
+  height: 1rem;
+}
+
+.experience-header-picker .date {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #9e9e9e;
+}
+
+.experience-header-picker .header-bottom {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 1rem;
+  color: #9e9e9e;
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+.experience-header-picker .title {
+  font-weight: 500;
+  font-style: normal;
+  /* color: #00573F; */
+  font-size: 1.15rem;
+  /* Persona Flair Color */
+}
+
+.experience-header-picker .location {
+  font-size: 0.9rem;
+}
+
+#ProfessionalExperienceContent .picker a:hover {
+  cursor: pointer;
+  color: rgb(220, 220, 220);
+}
+
+#ProfessionalExperienceContent .picker .experienceActive {
+  color: rgb(var(--text-primary));
+}
+
+.picker .experienceActive h3 {
+  color: rgb(var(--text-primary));
+}
+
+.picker p,
+.picker h3 {
+  margin: 2px;
+
+  text-align: inherit;
+}
+
+.picker p {
+  font-size: 0.7em;
+}
+
+.picker a:hover h3 {
+  color: rgb(185, 185, 185);
+}
+
+@media only screen and (max-width: 1050px) {
+
+  #ProfessionalExperienceInnerContainer {
+    height: auto;
+    justify-content: flex-start;
+  }
+
+  /*
+    Mobile "PE-picker fades into SingleExperience" transition.
+    The page title, the picker, and the page-level Back button (#Close,
+    a sibling of the inner container) all transition opacity so they
+    fade out together when an experience is selected. The
+    experience-selected class on the OUTER container triggers the
+    fade — placed there so it can reach #Close (sibling of the inner
+    container) and also override the inner container's own scrollbar.
+    The .preview (which contains SingleExperience) stays visible the
+    whole time — SingleExperience itself handles its own fade-in via
+    Framer Motion on its motion.div root.
+  */
+  #ProfessionalExperienceContainer > #ProfessionalExperienceInnerContainer > h1,
+  #ProfessionalExperienceContainer > #ProfessionalExperienceInnerContainer .picker,
+  #ProfessionalExperienceContainer > #Close {
+    transition: opacity 0.3s ease-out;
+  }
+
+  #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer > h1,
+  #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer .picker,
+  #ProfessionalExperienceContainer.experience-selected > #Close {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Suppress page scrolling while an experience is open — the
+     SingleExperience layer manages its own scroll, and the parent's
+     scrollbar(s) showing through is visual noise. Lock at multiple
+     levels because the actual scroller depends on layout: body when
+     the document is taller than viewport, the inner container if its
+     own content exceeds it. The :has() rule reaches body without
+     needing a JS bodyClass toggle. */
+  body:has(#ProfessionalExperienceContainer.experience-selected) {
+    overflow: hidden;
+  }
+
+  #ProfessionalExperienceContainer.experience-selected,
+  #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer {
+    overflow: hidden;
+  }
+
+  #ProfessionalExperienceContent {
+    display: block;
+    flex-direction: column;
+    overflow-y: visible;
+    box-sizing: border-box;
+    padding: 0 10px;
+  }
+
+  .picker a,
+  .picker h3 {
+    color: rgb(var(--text-primary));
+  }
+
+  #ProfessionalExperienceInnerContainer h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    margin-bottom: 1rem;
+  }
+
+  .picker h3 {
+    font-size: clamp(1rem, 5vw, 1.3em);
+  }
+
+  .picker p {
+    font-size: clamp(0.6rem, 3.5vw, 0.65em);
+    max-width: 100%;
+    margin: 5px 0;
+  }
+
+  #ProfessionalExperienceContent .picker {
+    width: 100%;
+    flex: 0 0 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  #ProfessionalExperienceContent .preview {
+    width: 100%;
+    flex: 0 0 100%;
+    height: auto;
+    padding: 10px;
+    /* box-sizing: width 100% + padding 10px without border-box would push
+       this child 20px past its parent and surface a horizontal scrollbar
+       on the document. */
+    box-sizing: border-box;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(var(--text-primary), 0.1);
+  }
+
+  .experience-header-picker .header-top,
+  .experience-header-picker .header-bottom {
+    flex-wrap: wrap;
+  }
+
+  .experience-header-picker .entity-name,
+  .experience-header-picker .title {
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  .experience-header-picker .dots {
+    display: none;
+  }
+
+  .picker-scroll-container {
+    overflow: visible;
+  }
+
+  .experience-group {
+    margin-bottom: 2rem;
+  }
+
+  .experience-header-picker {
+    width: 100%;
+  }
+
+  .experience-header-picker .header-top {
+    font-size: 1.1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .experience-header-picker .dots {
+    display: none;
+  }
+
+  .experience-header-picker .header-bottom {
+    font-size: 0.9rem;
+  }
+}
+
+#ProfessionalExperienceContent .preview h2 {
+  color: rgb(var(--text-primary));
+  text-align: center;
+  margin: 10px;
+  width: 100%;
+}
+
+/* ===== Custom preview panes (Credentials, Camerata as picker items) =====
+   These render in the same preview slot as SingleExperience when the
+   architect selects 'credentials' or 'camerata' from the picker. */
+
+.custom-preview {
+  /* Match SingleExperience's outer container so swapping the active
+     picker item never resizes the preview slot. */
+  width: 95%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Force long words / unbreakable runs to wrap rather than push
+     the slot wider. Belt-and-suspenders for the grid track fix. */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  color: rgba(240, 240, 240, 0.92);
+}
+
+.custom-preview h2 {
+  text-align: center;
+  margin: 6px 0 14px 0;
+  color: rgb(240, 240, 240);
+  font-size: clamp(1.6rem, 4vw, 2.1em);
+}
+
+.custom-preview p {
+  font-size: 1em;
+  line-height: 1.6;
+  margin: 0 0 14px 0;
+  color: rgba(240, 240, 240, 0.85);
+}
+
+.custom-preview a {
+  color: rgba(var(--blue-bright, 78, 160, 220), 0.95);
+  text-decoration: none;
+}
+
+.custom-preview a:hover {
+  text-decoration: underline;
+}
+
+.custom-preview-lede {
+  text-align: center;
+  color: rgba(240, 240, 240, 0.78) !important;
+  font-style: italic;
+  margin-bottom: 20px !important;
+}
+
+.custom-preview-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: rgba(var(--blue-bright, 78, 160, 220), 0.95);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.custom-preview-tag {
+  font-weight: 600;
+}
+
+.custom-preview-dot {
+  color: rgba(240, 240, 240, 0.5);
+}
+
+.custom-preview-date {
+  color: rgba(240, 240, 240, 0.6);
+}
+
+.custom-preview-cta {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 1em;
+  color: rgba(var(--blue-bright, 78, 160, 220), 0.95) !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+/* --- Section headers inside the custom-preview pane --- */
+/* Used by credentials entries (Microsoft, FullStack, Rutgers) to read
+   as inline flowing sections instead of bordered cards. Cards with
+   unbreakable link text inside were forcing the preview pane's
+   min-content width past its 50% flex-basis and shrinking the picker. */
+
+.custom-preview-h3 {
+  margin: 22px 0 2px 0;
+  color: rgb(240, 240, 240);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.custom-preview-h3-date {
+  color: rgba(var(--blue-bright, 78, 160, 220), 0.95) !important;
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0 0 6px 0 !important;
+  font-style: normal !important;
+}
+
+/* --- Inline images in the custom-preview pane --- */
+
+.custom-preview-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--blue-mid, 30, 90, 140), 0.45);
+  box-sizing: border-box;
+}
+
+@media only screen and (max-width: 1050px) {
+  .custom-preview {
+    padding: 16px 14px;
+  }
+
+  .custom-preview h2 {
+    font-size: 1.6em;
+  }
+
+  /* Mobile overlay parity with SingleExperience: when an experience is
+     selected (the parent has `.experience-selected`), the custom-preview
+     covers the viewport the same way SingleExperience does. Without this
+     rule, Credentials and Camerata render inline below the picker on
+     mobile while the other items overlay it, which breaks the UX
+     pattern visitors expect. Matches the SingleExperienceOuterContainer
+     rule in SingleExperience.css. */
+  #ProfessionalExperienceContainer.experience-selected .custom-preview {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    position: absolute;
+    height: 100dvh;
+    width: 100%;
+    box-sizing: border-box;
+    background: none;
+    z-index: 1000000000;
+    padding: 16px 14px;
+    overflow-y: auto;
+  }
+
+  /* Suppress the picker-scroll-container's scrollbar while an experience
+     is open on mobile. The picker is faded out (opacity: 0) but its
+     inner scroll container can still render a scrollbar against the
+     overlay, which reads as a leak from the parent component. Three
+     things in sequence: clip the overflow at the picker level, clip
+     at the scroll-container level, and explicitly hide the scrollbar
+     UI on both Webkit and Firefox so even browsers that render
+     scrollbar gutters on opacity-0 elements suppress them. */
+  #ProfessionalExperienceContainer.experience-selected .picker,
+  #ProfessionalExperienceContainer.experience-selected .picker-scroll-container {
+    overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #ProfessionalExperienceContainer.experience-selected .picker::-webkit-scrollbar,
+  #ProfessionalExperienceContainer.experience-selected .picker-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Belt-and-suspenders: also clip the grid content row so any
+     scrollbar that the picker's overflow:visible mobile default
+     would have created cannot bleed through. */
+  #ProfessionalExperienceContainer.experience-selected #ProfessionalExperienceContent {
+    overflow: hidden;
+  }
+
+  /* The html element on iOS Safari sometimes carries its own
+     scrollbar separate from body. Belt-and-suspenders alongside the
+     existing body:has() rule above. */
+  html:has(#ProfessionalExperienceContainer.experience-selected) {
+    overflow: hidden;
+  }
+
+  /* Back button on the custom-preview overlay. Matches the
+     SingleExperience .mobile button styling so the affordance reads
+     the same across all picker items. */
+  .custom-preview-back {
+    margin-top: 24px;
+  }
+
+  .custom-preview-back button {
+    align-self: flex-start;
+    margin: 5px 0 0 0;
+    border: 1px solid rgba(240, 240, 240, 0.2);
+    text-decoration: none;
+    font-size: 1.3rem;
+    color: rgb(240, 240, 240);
+    position: relative;
+    z-index: 100000;
+    background-color: rgba(201, 105, 105, 0.336);
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 2px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .custom-preview-back button:hover {
+    background-color: rgba(201, 105, 105, 0.801);
+  }
+}
+
+/* Hide the mobile back button on desktop (no overlay, no need to dismiss).
+   Matches the SingleExperience pattern where `.mobile` is display: none
+   by default and revealed only inside the mobile media query above. */
+.custom-preview-back {
+  display: none;
+}
+
+@media only screen and (max-width: 1050px) {
+  .custom-preview-back {
+    display: block;
+  }
+}
+
+/* Empty-preview placeholder: shown when no picker item is active.
+   Renders in TWO places, one for desktop (inside the .preview slot
+   on the right) and one for mobile (in document flow under the
+   "Work" page title, above the picker). React renders both
+   conditionally; CSS shows only the one for the active viewport.
+   Bright white so it reads clearly against the dark overlay. */
+.empty-preview-prompt {
+  text-align: center;
+  font-size: 0.9em;
+  color: rgb(240, 240, 240);
+  font-style: italic;
+  margin: 12px auto;
+  letter-spacing: 0.02em;
+}
+
+/* Desktop default: show the in-preview version, hide the mobile one. */
+.empty-preview-prompt-mobile {
+  display: none;
+}
+
+.empty-preview-prompt-desktop {
+  display: block;
+}
+
+@media only screen and (max-width: 1050px) {
+  /* Mobile: show the top-of-page version, hide the in-preview one
+     (which would otherwise stack below the picker). */
+  .empty-preview-prompt-mobile {
+    display: block;
+    margin: 0 auto 12px auto;
+    font-size: 0.85em;
+    padding: 0 10px;
+  }
+
+  .empty-preview-prompt-desktop {
+    display: none;
+  }
+}

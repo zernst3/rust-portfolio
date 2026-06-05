@@ -1,0 +1,162 @@
+#ContactMeContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+}
+
+#ContactMeContainer * {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#ContactMe {
+  background-color: transparent;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  height: 90%;
+  overflow: auto;
+  padding: 10px;
+  overflow-x: hidden;
+}
+
+#ContactMeContainer h1 {
+  margin: 0;
+  font-size: 3em;
+  color: rgb(240, 240, 240);
+  align-self: center;
+}
+
+#ContactMeContainer h2 {
+  text-align: center;
+  margin: 0;
+  font-size: 2.5em;
+  color: rgb(240, 240, 240);
+  align-self: center;
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+#ContactMe .page {
+  justify-self: center;
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+}
+
+#ContactMe .form {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+
+#ContactMe .form form {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#ContactMe .form form label {
+  margin-bottom: 5px;
+  font-size: 1.3em;
+  color: rgb(240, 240, 240);
+  /* Site-wide font from index.css (Aldrich on headings, Rajdhani on body) */
+  font-weight: 100;
+  line-height: 1.5;
+}
+
+#ContactMe .form form input,
+textarea {
+  font-size: 1.3em;
+  width: 90% !important;
+  max-width: 500px;
+  margin-bottom: 15px;
+  background-color: transparent;
+  color: rgb(240, 240, 240);
+  border-color: rgb(240, 240, 240);
+  border-radius: 5px;
+  /* Site-wide font from index.css (Aldrich on headings, Rajdhani on body) */
+  font-weight: 100;
+  line-height: 1.5;
+}
+
+#ContactMe .form form input {
+  text-align: center;
+}
+
+#ContactMe button {
+  font-size: 1.3em;
+  background-color: transparent;
+  color: rgb(240, 240, 240);
+  padding: 10px;
+  margin: 15px;
+  border-color: rgb(240, 240, 240);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+#ContactMe button:hover {
+  cursor: pointer;
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+#ContactMe .form form input:-webkit-autofill,
+textarea:-webkit-autofill {
+  font-size: 1.3em;
+  border: 1px solid rgb(240, 240, 240) !important;
+  -webkit-text-fill-color: rgb(240, 240, 240) !important;
+  -webkit-box-shadow: 0 0 0px 1000px #000000 inset !important;
+  background-color: transparent !important;
+}
+
+#ContactMe .disabled {
+  color: rgb(158, 158, 158);
+  background-color: rgba(50, 50, 50, 0.5);
+}
+
+#ContactMe .disabled:hover {
+  cursor: not-allowed;
+  background-color: rgba(50, 50, 50, 0.5);
+}
+
+#ContactMe #DirectContact {
+  text-align: center;
+  margin: auto;
+  color: rgb(240, 240, 240);
+  /* Site-wide font from index.css (Aldrich on headings, Rajdhani on body) */
+  font-weight: 100;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+
+#ContactMe h4 {
+  color: rgb(240, 240, 240);
+  margin: 5px;
+}
+
+#ContactMe #DirectContact,
+#ContactMe h2 a {
+  color: rgb(240, 240, 240);
+  /* Site-wide font from index.css (Aldrich on headings, Rajdhani on body) */
+  font-weight: 100;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ContactMe a,
+#ContactMe h3 {
+  text-align: center;
+  color: rgb(240, 240, 240);
+  /* Site-wide font from index.css (Aldrich on headings, Rajdhani on body) */
+  font-weight: 100;
+}

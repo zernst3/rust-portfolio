@@ -1,0 +1,27 @@
+#Close {
+  align-self: flex-start;
+  margin: 5px 5%;
+}
+
+#Close button {
+  border: 1px solid rgba(240, 240, 240, 0.2);
+  text-decoration: none;
+  font-size: 1.3rem;
+  color: rgb(240, 240, 240);
+  position: relative;
+  z-index: 100000;
+  background-color: rgba(201, 105, 105, 0.336);
+  display: inline-block;
+  padding: 10px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+#Close button:hover {
+  background-color: rgba(201, 105, 105, 0.801);
+  cursor: pointer;
+}
+
+#Close button p {
+  margin: 0;
+}

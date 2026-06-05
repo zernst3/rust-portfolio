@@ -1,0 +1,209 @@
+.diagram-container {
+    width: 96%;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(var(--blue-darker), 0.4);
+    border: 1px solid rgba(var(--blue-mid), 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.diagram-header {
+    background-color: rgba(var(--blue-mid), 0.2);
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(var(--blue-mid), 0.3);
+}
+
+.term-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.diagram-title {
+    margin: 0;
+    color: rgb(var(--blue-mid));
+    font-family: monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.term-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgb(var(--blue-bright));
+    font-family: monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Pulsing status dots */
+.live-dot,
+.ok-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(var(--blue-bright));
+    box-shadow: 0 0 6px rgb(var(--blue-bright));
+    animation: status-pulse 2s ease-in-out infinite;
+}
+
+.live-dot.small {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+}
+
+@keyframes status-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+.term-body {
+    padding: 1rem 1.25rem 1.25rem;
+    font-family: monospace;
+    color: #d1dbd7;
+}
+
+.term-statusline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: #b8d8c9;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px dashed rgba(var(--blue-mid), 0.25);
+}
+
+.term-statusline > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.term-clock {
+    color: rgb(var(--blue-bright));
+    font-variant-numeric: tabular-nums;
+}
+
+.agent-list-label {
+    color: rgb(var(--blue-mid));
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.6rem;
+}
+
+.agent-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.32rem 0;
+    font-size: 0.85rem;
+}
+
+.agent-name {
+    color: #E0E0E0;
+    white-space: nowrap;
+}
+
+.agent-leader {
+    flex: 1;
+    border-bottom: 1px dotted rgba(var(--blue-mid), 0.35);
+    margin: 0 0.2rem;
+    transform: translateY(-3px);
+}
+
+.agent-cadence {
+    color: rgb(var(--blue-mid));
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.term-footer {
+    margin-top: 0.95rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed rgba(var(--blue-mid), 0.25);
+}
+
+.footer-line {
+    font-size: 0.8rem;
+    color: #b8d8c9;
+    line-height: 1.9;
+}
+
+.footer-key {
+    display: inline-block;
+    color: rgb(var(--blue-bright));
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.footer-key.guard {
+    color: #d98c8c;
+}
+
+.enforced {
+    color: #d98c8c;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0.5rem;
+    border: 1px solid rgba(217, 140, 140, 0.4);
+    border-radius: 3px;
+    padding: 0.05rem 0.35rem;
+}
+
+.fn-mark {
+    color: rgb(var(--blue-bright));
+    font-weight: bold;
+}
+
+.term-footnote {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed rgba(var(--blue-mid), 0.25);
+    font-size: 0.76rem;
+    line-height: 1.65;
+    color: #9fb3ab;
+    font-style: italic;
+}
+
+.term-footnote .fn-why {
+    color: #b8d8c9;
+    font-style: normal;
+    font-weight: bold;
+}
+
+.term-prompt {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: rgb(var(--blue-mid));
+}
+
+.cursor {
+    color: rgb(var(--blue-bright));
+    animation: cursor-blink 1.1s steps(1) infinite;
+}
+
+@keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+}
+
+@media (max-width: 850px) {
+    .agent-name {
+        white-space: normal;
+    }
+
+    .term-statusline {
+        font-size: 0.76rem;
+    }
+}

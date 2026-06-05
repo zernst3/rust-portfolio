@@ -1,0 +1,173 @@
+/* Infrastructure Diagram Container */
+.diagram-container {
+    width: 96%;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(var(--blue-darker), 0.4);
+    border: 1px solid rgba(var(--blue-mid), 0.4);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.svg-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.architecture-svg {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    min-height: 250px;
+}
+
+/* Node Styles */
+.node-rect {
+    fill: #051611;
+    stroke: rgba(var(--blue-mid), 0.8);
+    stroke-width: 1.5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.nodes g {
+    cursor: pointer;
+}
+
+.nodes g:hover .node-rect {
+    stroke: #008f68;
+    stroke-width: 2px;
+    fill: rgba(var(--blue-mid), 0.15);
+    filter: url(#node-glow);
+}
+
+.node-text {
+    fill: #E0E0E0;
+    font-family: monospace;
+    font-size: 16px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.node-subtext {
+    fill: #d1dbd7;
+    font-family: monospace;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+/* Path Connections */
+.path-line {
+    fill: none;
+    transition: all 0.3s ease;
+}
+
+.static-path {
+    stroke: rgba(var(--blue-mid), 0.4);
+    stroke-width: 2px;
+}
+
+.path-label {
+    fill: rgb(var(--blue-mid));
+    font-family: monospace;
+    font-size: 13px;
+    text-anchor: middle;
+}
+
+/* Animated Pulse Paths */
+.pulse-path {
+    stroke: #00573F;
+    stroke-width: 3px;
+    stroke-dasharray: 6, 12;
+    filter: drop-shadow(0 0 4px rgba(var(--blue-mid), 0.6));
+    will-change: stroke-dashoffset;
+}
+
+.path-1 {
+    animation: flow-anim 3s linear infinite;
+}
+
+.path-2 {
+    animation: flow-anim 2.5s linear infinite;
+}
+
+.path-3 {
+    animation: flow-anim 3.5s linear infinite;
+}
+
+.path-4 {
+    animation: flow-anim 2s linear infinite;
+}
+
+.path-5 {
+    animation: flow-anim 5s linear infinite;
+}
+
+@keyframes flow-anim {
+    from {
+        stroke-dashoffset: 36;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Tooltip Overlay */
+.tooltip-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(var(--blue-darker), 0.9);
+    border: 1px solid #00573F;
+    border-radius: 6px;
+    padding: 10px 20px;
+    max-width: 80%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(var(--blue-mid), 0.3);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.tooltip-overlay p {
+    margin: 0;
+    color: #c7d1ce;
+    font-family: monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Mobile Responsiveness (Stacking & Touch-Scroll) */
+@media (max-width: 850px) {
+    .svg-wrapper {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 1.5rem;
+        /* Room for touch scrollbar */
+    }
+
+    .architecture-svg {
+        /* Enforce a minimum width so the vector graph and its text remain highly legible.
+           It will horizontal-scroll natively inside the robust wrapper overflow bounds. */
+        min-height: 200px;
+        min-width: 750px;
+    }
+
+    .node-text {
+        font-size: 16px;
+    }
+
+    .tooltip-overlay {
+        bottom: 10px;
+        width: 90%;
+        max-width: 350px;
+    }
+}

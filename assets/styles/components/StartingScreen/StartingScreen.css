@@ -1,0 +1,32 @@
+#StartingScreenContainer h1 {
+  color: rgb(255, 255, 255);
+  -webkit-text-stroke-color: rgb(240, 240, 240);
+  /* -webkit-text-stroke-width: 1px; */
+  font-size: 6rem;
+  margin: 5px;
+  /* Site-wide Aldrich on headings (inherits from index.css). */
+}
+
+#StartingScreenContainer h3 {
+  color: rgb(158, 158, 158);
+  font-size: 2rem;
+  margin: 5px;
+}
+
+#StartingScreenContainer h3:hover {
+  cursor: pointer;
+}
+
+#StartingScreenContainer {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 670px) {
+    #StartingScreenContainer h1 {
+    font-size: 3rem;
+  }
+}
