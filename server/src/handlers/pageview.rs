@@ -11,8 +11,8 @@ use crate::mailgun;
 pub async fn pageview() -> StatusCode {
     tracing::info!("pageview ping received");
 
-    let (api_key, domain) = match mailgun::read_env() {
-        Ok(pair) => pair,
+    let (api_key, domain, base_url) = match mailgun::read_env() {
+        Ok(trio) => trio,
         Err(e) => {
             tracing::error!(error = %e, "mailgun env not configured");
             return StatusCode::SERVICE_UNAVAILABLE;
@@ -27,7 +27,7 @@ pub async fn pageview() -> StatusCode {
         ("text", "Someone visited your site."),
     ];
 
-    if let Err(e) = mailgun::send(&api_key, &domain, params).await {
+    if let Err(e) = mailgun::send(&api_key, &domain, &base_url, params).await {
         tracing::error!(error = %e, "pageview email failed");
         return StatusCode::SERVICE_UNAVAILABLE;
     }
