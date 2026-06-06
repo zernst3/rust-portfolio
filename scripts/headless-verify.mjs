@@ -113,6 +113,24 @@ class CDP {
       buttons: 0,
     });
   }
+  async click(x, y) {
+    await this.send("Input.dispatchMouseEvent", {
+      type: "mousePressed",
+      x,
+      y,
+      button: "left",
+      clickCount: 1,
+      buttons: 1,
+    });
+    await this.send("Input.dispatchMouseEvent", {
+      type: "mouseReleased",
+      x,
+      y,
+      button: "left",
+      clickCount: 1,
+      buttons: 0,
+    });
+  }
 }
 
 async function connectCDP(userDataDir) {
@@ -323,6 +341,21 @@ async function run() {
         ph ? ph.opacity > 0.4 && ph.width > 50 : false,
         ph ? `opacity=${ph.opacity} width=${ph.width.toFixed(0)}` : "no .picker-highlight"
       );
+
+      // CHECK: selecting a sub-experience fades the preview in (opacity
+      // transition wired) and settles to 1 (not stuck hidden).
+      const previewFade = await cdp.eval(
+        `(()=>{const p=document.querySelector('.preview');if(!p)return false;` +
+          `return getComputedStyle(p).transitionProperty.includes('opacity');})()`
+      );
+      record("preview-fade-style", false, previewFade, ".preview transitions opacity");
+      await cdp.click(pickRect.x, pickRect.y);
+      await sleep(700);
+      const po = await cdp.eval(
+        `(()=>{const p=document.querySelector('.preview');` +
+          `return p?parseFloat(getComputedStyle(p).opacity):-1;})()`
+      );
+      record("preview-fade-settles", true, po > 0.95, `opacity=${po}`);
     }
 
     // CHECK: no uncaught exceptions / console errors anywhere above.

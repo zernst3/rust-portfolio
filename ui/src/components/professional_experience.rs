@@ -46,6 +46,8 @@ pub fn ProfessionalExperience() -> Element {
     let mut bar_top: Signal<f64> = use_signal(|| 0.0);
     let mut bar_height: Signal<f64> = use_signal(|| 0.0);
     let mut bar_visible: Signal<bool> = use_signal(|| false);
+    // Preview fade-in opacity. Driven on selection (see open_experience).
+    let mut preview_opacity: Signal<f64> = use_signal(|| 1.0);
 
     // Auto-select "scopeAndTrajectory" on desktop on mount.
     //
@@ -101,6 +103,34 @@ pub fn ProfessionalExperience() -> Element {
         });
     };
 
+    // Open a sub-experience: play sound, select it, slide the bar, and fade the
+    // preview in. The fade is the opacity-signal pattern (same as the home
+    // subtitle): set opacity 0 SYNCHRONOUSLY with the selection so there's a
+    // single render with the new content already hidden (no flash), then
+    // transition back to 1 after a paint. Simple and reliable — no key-remount,
+    // which is the unreliable approach that made only the first item animate.
+    let open_experience = use_callback(move |key: &'static str| {
+        if !*audio.is_muted.read() {
+            play_sound("/static/sounds/select.mp3", 0.45);
+        }
+        current.set(Some(key));
+        measure_bar(key);
+        preview_opacity.set(0.0);
+        let mut po = preview_opacity;
+        spawn(async move {
+            // Double rAF: guarantee the browser paints opacity:0 before the
+            // transition to 1, so the fade actually plays.
+            document::eval(
+                "await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});});",
+            )
+            .await
+            .ok();
+            po.set(1.0);
+        });
+    });
+
+    let preview_opacity_val = *preview_opacity.read();
+
     let bar_style = if *bar_visible.read() {
         format!(
             "top: {}px; height: {}px; opacity: 1; transition: top 0.18s cubic-bezier(0.4,0,0.2,1), height 0.18s ease, opacity 0.2s ease",
@@ -150,13 +180,7 @@ pub fn ProfessionalExperience() -> Element {
                                     PickerItem {
                                         exp_key: "credentials",
                                         current: current,
-                                        on_select: move |key| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/select.mp3", 0.45);
-                                            }
-                                            current.set(Some(key));
-                                            measure_bar(key);
-                                        },
+                                        on_select: move |key| open_experience.call(key),
                                         on_hover: move |key| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -188,13 +212,7 @@ pub fn ProfessionalExperience() -> Element {
                                             key: "{key}",
                                             exp_key: key,
                                             current: current,
-                                            on_select: move |k| {
-                                                if !*audio.is_muted.read() {
-                                                    play_sound("/static/sounds/select.mp3", 0.45);
-                                                }
-                                                current.set(Some(k));
-                                                measure_bar(k);
-                                            },
+                                            on_select: move |k| open_experience.call(k),
                                             on_hover: move |k| {
                                                 if !*audio.is_muted.read() {
                                                     play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -237,13 +255,7 @@ pub fn ProfessionalExperience() -> Element {
                                             key: "{key}",
                                             exp_key: key,
                                             current: current,
-                                            on_select: move |k| {
-                                                if !*audio.is_muted.read() {
-                                                    play_sound("/static/sounds/select.mp3", 0.45);
-                                                }
-                                                current.set(Some(k));
-                                                measure_bar(k);
-                                            },
+                                            on_select: move |k| open_experience.call(k),
                                             on_hover: move |k| {
                                                 if !*audio.is_muted.read() {
                                                     play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -267,13 +279,7 @@ pub fn ProfessionalExperience() -> Element {
                                     PickerItem {
                                         exp_key: "chorale",
                                         current: current,
-                                        on_select: move |k| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/select.mp3", 0.45);
-                                            }
-                                            current.set(Some(k));
-                                            measure_bar(k);
-                                        },
+                                        on_select: move |k| open_experience.call(k),
                                         on_hover: move |k| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -296,13 +302,7 @@ pub fn ProfessionalExperience() -> Element {
                                     PickerItem {
                                         exp_key: "camerata",
                                         current: current,
-                                        on_select: move |k| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/select.mp3", 0.45);
-                                            }
-                                            current.set(Some(k));
-                                            measure_bar(k);
-                                        },
+                                        on_select: move |k| open_experience.call(k),
                                         on_hover: move |k| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -316,7 +316,9 @@ pub fn ProfessionalExperience() -> Element {
                         }
 
                         // ─── Preview panel ────────────────────────────────────
-                        div { class: "preview",
+                        div {
+                            class: "preview",
+                            style: "opacity: {preview_opacity_val}; transition: opacity 0.25s ease;",
                             {match *current.read() {
                                 None => rsx! {
                                     p { class: "empty-preview-prompt empty-preview-prompt-desktop",
