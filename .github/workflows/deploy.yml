@@ -24,6 +24,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Surface the repo Variables (these are NOT secrets) and fail fast with a
+      # clear message if ACR_NAME is missing — the #1 deploy misconfiguration is
+      # setting it as a Secret (invisible to `vars.`) or with the .azurecr.io
+      # suffix. Brackets make an empty value obvious.
+      - name: Validate config
+        run: |
+          echo "ACR_NAME=[${{ vars.ACR_NAME }}]"
+          echo "RESOURCE_GROUP=[${{ vars.RESOURCE_GROUP }}]"
+          echo "CONTAINER_APP_NAME=[${{ vars.CONTAINER_APP_NAME }}]"
+          if [ -z "${{ vars.ACR_NAME }}" ]; then
+            echo "::error::ACR_NAME repo Variable is empty. Set it under Settings > Secrets and variables > Actions > the VARIABLES tab (not Secrets), as the bare registry name (no .azurecr.io)."
+            exit 1
+          fi
+          case "${{ vars.ACR_NAME }}" in
+            *.*) echo "::error::ACR_NAME contains a dot — use the bare registry name (e.g. acrrustportfolio79gvbl), not the .azurecr.io login server."; exit 1 ;;
+          esac
+
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
