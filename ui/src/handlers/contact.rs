@@ -20,6 +20,16 @@ pub async fn contact(Json(body): Json<ContactRequest>) -> StatusCode {
     };
 
     let email = body.email.as_str();
+
+    // `From` MUST be on the Mailgun sending domain so SPF + DKIM align with the
+    // From header (DMARC alignment). Sending "from" a @live.com address, or the
+    // visitor's own address, THROUGH Mailgun fails DMARC at the recipient
+    // (Outlook/Gmail), which accepts the message (SMTP 250) and then silently
+    // drops it — delivered in Mailgun's log, but never in the inbox. The human
+    // reply target goes in Reply-To instead.
+    let from_addr = format!("Zachary Ernst <no-reply@{domain}>");
+    let owner = "Zachary Ernst <zernst3@live.com>";
+
     let vars_thank_you = format!(
         r#"{{"recipient_name": "{}"}}"#,
         body.name.replace('"', "\\\"")
@@ -31,10 +41,11 @@ pub async fn contact(Json(body): Json<ContactRequest>) -> StatusCode {
         email.replace('"', "\\\""),
     );
 
-    // Thank-you to visitor
+    // Thank-you to the visitor; replies route back to Zach.
     let thank_you_params: &[(&str, &str)] = &[
-        ("from", "Zachary Ernst <zernst3@live.com>"),
+        ("from", from_addr.as_str()),
         ("to", email),
+        ("h:Reply-To", "zernst3@live.com"),
         ("subject", "Thank You for your Email"),
         ("template", "thank_you_email"),
         ("h:X-Mailgun-Variables", &vars_thank_you),
@@ -44,10 +55,11 @@ pub async fn contact(Json(body): Json<ContactRequest>) -> StatusCode {
         return StatusCode::SERVICE_UNAVAILABLE;
     }
 
-    // Notification to Zach
+    // Notification to Zach; replies route back to the visitor.
     let notify_params: &[(&str, &str)] = &[
-        ("from", email),
-        ("to", "Zachary Ernst <zernst3@live.com>"),
+        ("from", from_addr.as_str()),
+        ("to", owner),
+        ("h:Reply-To", email),
         ("subject", &body.subject),
         ("template", "email_to_me"),
         ("h:X-Mailgun-Variables", &vars_notify),
