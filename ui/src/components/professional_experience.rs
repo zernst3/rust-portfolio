@@ -48,13 +48,23 @@ pub fn ProfessionalExperience() -> Element {
     let mut bar_visible: Signal<bool> = use_signal(|| false);
 
     // Auto-select "scopeAndTrajectory" on desktop on mount.
-    use_future(move || async move {
-        let eval = document::eval("dioxus.send(window.innerWidth > 1050)");
-        if let Ok(v) = eval.await {
-            if v.as_bool().unwrap_or(false) {
-                current.set(Some("scopeAndTrajectory"));
+    //
+    // WHY use_effect + spawn instead of use_future:
+    // use_future's closure is replaced by use_callback on every re-render, and
+    // use_hook_did_run calls task.resume() on every render. While resume() on a
+    // finished task is a no-op, use_future captures `current` in its closure which
+    // can subscribe to reactive tracking if Dioxus ever changes that behavior.
+    // use_effect with no reactive reads in its body runs ONCE on mount and never
+    // re-runs (same fix pattern as home.rs subtitle rotation, PORT-CC-1).
+    use_effect(move || {
+        spawn(async move {
+            let eval = document::eval("dioxus.send(window.innerWidth > 1050)");
+            if let Ok(v) = eval.await {
+                if v.as_bool().unwrap_or(false) {
+                    current.set(Some("scopeAndTrajectory"));
+                }
             }
-        }
+        });
     });
 
     let is_selected = current.read().is_some();

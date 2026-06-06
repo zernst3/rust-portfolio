@@ -40,13 +40,16 @@ pub fn App() -> Element {
     provide_mobile_menu_context();
 
     // Load Bevy WASM scene on first client render (no-op on SSR per PORT-BEVY-1).
-    use_effect(|| {
-        let _ = document::eval(
-            "import('/assets/portfolio_scene.js')\
-             .then(function(m){return m.default();})\
-             .catch(function(e){console.warn('Bevy scene unavailable',e);});",
-        );
-    });
+    // TEMPORARILY DISABLED 2026-06-05 to bisect a main-thread freeze (white page,
+    // dead refresh, slow tab close). If the app is responsive with this off, the
+    // Bevy event loop / 25MB Bevy bundle is the culprit. Re-enable once isolated.
+    // use_effect(|| {
+    //     let _ = document::eval(
+    //         "import('/assets/portfolio_scene.js')\
+    //          .then(function(m){return m.default();})\
+    //          .catch(function(e){console.warn('Bevy scene unavailable',e);});",
+    //     );
+    // });
 
     rsx! {
         document::Title { "Zachary Ernst" }
@@ -77,7 +80,7 @@ pub fn App() -> Element {
             href: "/assets/styles/components/ProfessionalExperience/ProfessionalExperience.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/SingleExperience.css"
+            href: "/assets/styles/components/SingleExperience/SingleExperience.css"
         }
         document::Stylesheet {
             href: "/assets/styles/components/ProfessionalExperience/AgentWorkflowDiagram/AgentWorkflowDiagram.css"
