@@ -92,6 +92,24 @@ exists). `Contributor` on the RG is the simple choice and covers `az acr build`
 
 ## Step 2 — One-time: provision infrastructure (Terraform)
 
+First, register the resource providers this stack uses (one time per
+subscription — the provider is configured NOT to bulk-register, which otherwise
+hangs on fresh subscriptions). These are idempotent:
+
+```bash
+for ns in Microsoft.App Microsoft.ContainerRegistry Microsoft.KeyVault \
+          Microsoft.OperationalInsights Microsoft.ManagedIdentity; do
+  az provider register --namespace "$ns"
+done
+# Confirm they're "Registered" (takes a minute or two) before applying:
+for ns in Microsoft.App Microsoft.ContainerRegistry Microsoft.KeyVault \
+          Microsoft.OperationalInsights Microsoft.ManagedIdentity; do
+  echo "$ns: $(az provider show -n $ns --query registrationState -o tsv)"
+done
+```
+
+Then provision:
+
 ```bash
 cd infrastructure
 cp terraform.tfvars.example terraform.tfvars   # set mailgun_domain, project, etc.

@@ -24,6 +24,12 @@ terraform {
 }
 
 provider "azurerm" {
+  # Don't let Terraform bulk-register every supported resource provider on the
+  # subscription. On a fresh/large subscription that bulk registration stalls and
+  # throws "409 ConflictingConcurrentWrite", which looks like a hang. We register
+  # only the providers we actually use, via az CLI (see docs/DEPLOYMENT.md).
+  # Microsoft.Resources and Microsoft.Authorization are always registered.
+  resource_provider_registrations = "none"
   features {}
 }
 

@@ -84,13 +84,13 @@ resource "azurerm_role_assignment" "kv_deployer" {
 
 # ── Key Vault + Mailgun secret ───────────────────────────────────────────────
 resource "azurerm_key_vault" "main" {
-  name                      = "kv${local.base_nodash}${random_string.suffix.result}"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
-  tenant_id                 = data.azurerm_client_config.current.tenant_id
-  sku_name                  = "standard"
-  enable_rbac_authorization = true
-  tags                      = local.tags
+  name                       = "kv${local.base_nodash}${random_string.suffix.result}"
+  location                   = azurerm_resource_group.main.location
+  resource_group_name        = azurerm_resource_group.main.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "standard"
+  rbac_authorization_enabled = true
+  tags                       = local.tags
 }
 
 resource "azurerm_key_vault_secret" "mailgun" {
