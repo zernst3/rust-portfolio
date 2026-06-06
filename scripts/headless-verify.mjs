@@ -237,7 +237,7 @@ async function run() {
       await cdp.mouseMove(workRect.x, workRect.y);
       await sleep(450);
       const hl = await cdp.eval(
-        `(()=>{const b=document.querySelector('#Home .pageLinks .nav-highlight');` +
+        `(()=>{const b=document.querySelector('#Home .nav-highlight');` +
           `if(!b)return null;const s=getComputedStyle(b);` +
           `return {opacity:parseFloat(s.opacity),top:parseFloat(s.top)||b.offsetTop};})()`
       );
@@ -257,19 +257,39 @@ async function run() {
       );
     }
 
-    // CHECK: Links item highlight does NOT overflow the menu width (Bug 2).
-    const overflow = await cdp.eval(
-      `(()=>{const li=document.querySelector('#Home .links li');` +
-        `const mc=document.querySelector('#Home .menuContainer');` +
-        `if(!li||!mc)return null;` +
-        `return {liRight:li.getBoundingClientRect().right,mcRight:mc.getBoundingClientRect().right};})()`
+    // CHECK: hovering Links drives the SAME shared bar (fade) AND does not
+    // overflow the menu width. The old per-Links CSS gradient is gone.
+    const linksRect = await cdp.eval(
+      `(()=>{const it=document.querySelector('#Home .links .navbarItem');` +
+        `if(!it)return null;const r=it.getBoundingClientRect();` +
+        `return {x:r.left+r.width/2,y:r.top+r.height/2};})()`
     );
-    record(
-      "links-no-overflow",
-      true,
-      overflow ? overflow.liRight <= overflow.mcRight + 1.5 : false,
-      overflow ? `li.right=${overflow.liRight.toFixed(1)} menu.right=${overflow.mcRight.toFixed(1)}` : "elements not found"
-    );
+    if (!linksRect) {
+      record("links-shared-highlight", true, false, "Links item not found");
+      record("links-no-overflow", true, false, "Links item not found");
+    } else {
+      await cdp.mouseMove(linksRect.x, linksRect.y);
+      await sleep(450);
+      const lb = await cdp.eval(
+        `(()=>{const b=document.querySelector('#Home .nav-highlight');` +
+          `const mc=document.querySelector('#Home .menuContainer');` +
+          `if(!b||!mc)return null;const s=getComputedStyle(b);` +
+          `const br=b.getBoundingClientRect();` +
+          `return {opacity:parseFloat(s.opacity),right:br.right,mcRight:mc.getBoundingClientRect().right};})()`
+      );
+      record(
+        "links-shared-highlight",
+        true,
+        lb ? lb.opacity > 0.4 : false,
+        lb ? `opacity=${lb.opacity}` : "no shared bar"
+      );
+      record(
+        "links-no-overflow",
+        true,
+        lb ? lb.right <= lb.mcRight + 1.5 : false,
+        lb ? `bar.right=${lb.right.toFixed(1)} menu.right=${lb.mcRight.toFixed(1)}` : "n/a"
+      );
+    }
 
     // CHECK: a secondary route hydrates too (page-enter animation present).
     await cdp.send("Page.navigate", { url: `${BASE}/work?cb=${Date.now()}` });
@@ -278,6 +298,32 @@ async function run() {
       `(()=>{const r=document.querySelector('.page-enter');return !!r;})()`
     );
     record("work-page-page-enter", false, workPage, ".page-enter root present");
+
+    // CHECK: Work-page experience list has a working hover highlight (the
+    // picker-highlight bar), mirroring the home menu. Previously invisible
+    // (no left/width + join() read). Hover a non-selected item and assert it.
+    const pickRect = await cdp.eval(
+      `(()=>{const it=document.querySelector('[data-exp-key="realTimeSyncLayer"]');` +
+        `if(!it)return null;const r=it.getBoundingClientRect();` +
+        `return {x:r.left+r.width/2,y:r.top+r.height/2};})()`
+    );
+    if (!pickRect) {
+      record("work-picker-highlight", true, false, "picker item not found");
+    } else {
+      await cdp.mouseMove(pickRect.x, pickRect.y);
+      await sleep(450);
+      const ph = await cdp.eval(
+        `(()=>{const b=document.querySelector('.picker-highlight');if(!b)return null;` +
+          `const s=getComputedStyle(b);const r=b.getBoundingClientRect();` +
+          `return {opacity:parseFloat(s.opacity),width:r.width};})()`
+      );
+      record(
+        "work-picker-highlight",
+        true,
+        ph ? ph.opacity > 0.4 && ph.width > 50 : false,
+        ph ? `opacity=${ph.opacity} width=${ph.width.toFixed(0)}` : "no .picker-highlight"
+      );
+    }
 
     // CHECK: no uncaught exceptions / console errors anywhere above.
     record(

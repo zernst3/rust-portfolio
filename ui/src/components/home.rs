@@ -166,6 +166,35 @@ pub fn Home() -> Element {
         });
     });
 
+    // Shared sliding-highlight mover. Both the page links AND the Links button
+    // call this so they all drive the SAME `.nav-highlight` bar (identical fade
+    // + travel). `idx` is the item's position among `#mobile-menu-content
+    // .navbarItem` (page links first, then the Links trigger). use_callback is
+    // Copy, so every hover handler can call it without moving a fresh closure.
+    let measure_highlight = use_callback(move |idx: usize| {
+        let mut hl = highlight;
+        let mut hl_on = highlight_on;
+        spawn(async move {
+            let js = format!(
+                "(function(){{\
+                  var items=document.querySelectorAll('#mobile-menu-content .navbarItem');\
+                  var el=items[{idx}];\
+                  if(!el){{dioxus.send(null);return;}}\
+                  var parent=document.getElementById('mobile-menu-content');\
+                  if(!parent){{dioxus.send(null);return;}}\
+                  var pr=parent.getBoundingClientRect();\
+                  var er=el.getBoundingClientRect();\
+                  dioxus.send({{top:er.top-pr.top,height:er.height}});\
+                }})()"
+            );
+            let mut ev = document::eval(&js);
+            if let Ok(Some(pos)) = ev.recv::<Option<ItemPos>>().await {
+                hl.set(pos);
+                hl_on.set(true);
+            }
+        });
+    });
+
     let is_muted_val = *is_muted.read();
     let is_open_val = *menu_open.read();
     let current_idx = *header_idx.read();
@@ -209,25 +238,29 @@ pub fn Home() -> Element {
                         div {
                             id: "mobile-menu-content",
                             class: "mobile-menu-content",
+                            // Leaving the whole menu hides the shared bar; moving
+                            // BETWEEN sections (page links <-> Links) keeps it alive.
+                            onmouseleave: move |_| {
+                                highlight_on.set(false);
+                                is_hovering.set(false);
+                            },
 
-                            // ── Page links with Halo-style sliding highlight ───
+                            // Single shared sliding highlight bar for the entire
+                            // menu (page links AND Links). Absolutely positioned
+                            // within #mobile-menu-content; CSS handles color/border.
+                            div {
+                                class: "nav-highlight",
+                                style: "top: {current_highlight.top}px; \
+                                        height: {current_highlight.height}px; \
+                                        opacity: {highlight_bar_opacity}; \
+                                        transition: top 0.28s cubic-bezier(0.22,1,0.36,1), \
+                                                    height 0.28s cubic-bezier(0.22,1,0.36,1), \
+                                                    opacity 0.2s ease;",
+                            }
+
+                            // ── Page links ─────────────────────────────────────
                             div {
                                 class: "pageLinks",
-                                onmouseleave: move |_| {
-                                    highlight_on.set(false);
-                                    is_hovering.set(false);
-                                },
-
-                                // Absolutely-positioned highlight bar; CSS handles color/border.
-                                div {
-                                    class: "nav-highlight",
-                                    style: "top: {current_highlight.top}px; \
-                                            height: {current_highlight.height}px; \
-                                            opacity: {highlight_bar_opacity}; \
-                                            transition: top 0.28s cubic-bezier(0.22,1,0.36,1), \
-                                                        height 0.28s cubic-bezier(0.22,1,0.36,1), \
-                                                        opacity 0.2s ease;",
-                                }
 
                                 for (idx, item) in NAV_ITEMS.iter().enumerate() {
                                     Link {
@@ -243,29 +276,7 @@ pub fn Home() -> Element {
                                             // Hover events on li: Link doesn't expose onmouseenter.
                                             onmouseenter: move |_| {
                                                 is_hovering.set(true);
-                                                let mut hl = highlight;
-                                                let mut hl_on = highlight_on;
-                                                spawn(async move {
-                                                    let js = format!(
-                                                        "(function(){{\
-                                                          var items=document.querySelectorAll(\
-                                                            '#Home .pageLinks .navbarItem');\
-                                                          var el=items[{idx}];\
-                                                          if(!el){{dioxus.send(null);return;}}\
-                                                          var parent=el.closest('.pageLinks');\
-                                                          if(!parent){{dioxus.send(null);return;}}\
-                                                          var pr=parent.getBoundingClientRect();\
-                                                          var er=el.getBoundingClientRect();\
-                                                          dioxus.send({{top:er.top-pr.top,\
-                                                                        height:er.height}});\
-                                                        }})()"
-                                                    );
-                                                    let mut ev = document::eval(&js);
-                                                    if let Ok(Some(pos)) = ev.recv::<Option<ItemPos>>().await {
-                                                        hl.set(pos);
-                                                        hl_on.set(true);
-                                                    }
-                                                });
+                                                measure_highlight.call(idx);
                                                 if !*is_muted.peek() {
                                                     spawn(async move {
                                                         // Same fix: dioxus.send() after 5 ms.
@@ -300,7 +311,23 @@ pub fn Home() -> Element {
                                             style: "display: flex; align-items: center; gap: 15px; \
                                                     width: 100%; background: none; border: none; \
                                                     cursor: pointer; padding: 0; color: inherit;",
-                                            onmouseenter: move |_| is_hovering.set(true),
+                                            onmouseenter: move |_| {
+                                                is_hovering.set(true);
+                                                // idx = NAV_ITEMS.len() → the Links
+                                                // trigger is the last `.navbarItem`,
+                                                // so it reuses the SAME shared bar.
+                                                measure_highlight.call(NAV_ITEMS.len());
+                                                if !*is_muted.peek() {
+                                                    spawn(async move {
+                                                        document::eval(
+                                                            "setTimeout(function(){dioxus.send(null)},5)"
+                                                        )
+                                                        .await
+                                                        .ok();
+                                                        play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                                    });
+                                                }
+                                            },
                                             onmouseleave: move |_| is_hovering.set(false),
                                             onclick: move |_| {
                                                 if !*is_muted.peek() {

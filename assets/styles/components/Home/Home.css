@@ -74,30 +74,30 @@
   align-items: center;
 }
 
-/* The Links dropdown trigger keeps the simple CSS hover fill. The main
-   menu (.pageLinks) uses the sliding bar below instead. */
-#Home .menuContainer .links div li:hover {
-  background: linear-gradient(90deg,
-      rgba(194, 167, 46, 0.7) 0%,
-      rgba(189, 157, 86, 0.5) 51%,
-      rgba(179, 164, 96, 0.3) 100%);
-}
-
 #Home .menuContainer a,
 #Home .menuContainer div {
   text-decoration: none;
   position: relative;
 }
 
-/* #1 Sliding selection bar — a single highlight that travels between items */
+/* Sliding selection bar — ONE highlight shared by the whole menu (page links
+   AND the Links trigger). It lives in #mobile-menu-content so it can travel
+   across both sections and fade in/out identically for every item. */
+#Home .mobile-menu-content {
+  position: relative;
+}
+
 #Home .pageLinks {
   position: relative;
 }
 
-#Home .pageLinks .nav-highlight {
+#Home .mobile-menu-content .nav-highlight {
   position: absolute;
   left: 0;
   width: 100%;
+  /* border-box so the 2px border-left counts inside width:100% (otherwise the
+     bar is 2px wider than the menu and bleeds past the right edge). */
+  box-sizing: border-box;
   z-index: 0;
   pointer-events: none;
   border-radius: 2px;
@@ -110,7 +110,10 @@
   border-left: 2px solid rgba(224, 204, 128, 0.9);
 }
 
-#Home .pageLinks a.navbarItem {
+/* Keep every menu item's text/icon above the shared bar. */
+#Home .pageLinks a.navbarItem,
+#Home .links .navbarItem {
+  position: relative;
   z-index: 1;
 }
 

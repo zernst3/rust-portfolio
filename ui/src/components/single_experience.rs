@@ -26,7 +26,8 @@ pub fn SingleExperience(props: SingleExperienceProps) -> Element {
     rsx! {
         div {
             id: "SingleExperienceOuterContainer",
-            style: "animation: fade-in-kf 0.3s ease-out 0.15s forwards; opacity: 0",
+            // No open animation — kept consistent with the other previews
+            // (Credentials / Chorale / Camerata), which render instantly.
             div { id: "SingleExperienceContainer",
                 div { id: "SingleExperience",
                     // Mobile-only title — CSS hides on desktop

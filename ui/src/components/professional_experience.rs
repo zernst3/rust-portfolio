@@ -82,8 +82,11 @@ pub fn ProfessionalExperience() -> Element {
                 dioxus.send({{ top: er.top - pr.top + parent.scrollTop, height: er.height }});
                 "#
             );
-            let eval = document::eval(&js);
-            if let Ok(val) = eval.await {
+            // Read the measured rect via recv(): in dioxus 0.7.9 `.await`/join()
+            // returns the JS *return value*, not the `dioxus.send()` payload —
+            // so the bar never became visible. recv() reads the sent value.
+            let mut eval = document::eval(&js);
+            if let Ok(val) = eval.recv::<serde_json::Value>().await {
                 if let (Some(top), Some(height)) = (
                     val.get("top").and_then(|v| v.as_f64()),
                     val.get("height").and_then(|v| v.as_f64()),
