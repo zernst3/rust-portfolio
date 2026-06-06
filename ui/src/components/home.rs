@@ -118,18 +118,31 @@ pub fn Home() -> Element {
     let mut highlight: Signal<Option<ItemPos>> = use_signal(|| None);
     let mut links_open: Signal<bool> = use_signal(|| false);
 
-    // Rotate subtitle every 7 s. use_future is client-only (docs: "will not run
-    // on the server"), so SSR always renders header[0].
-    // dioxus.send() is required to resolve eval.await — a bare Promise.resolve
-    // or setTimeout(r, ms) without calling dioxus.send() blocks forever.
-    use_future(move || async move {
-        loop {
-            document::eval("setTimeout(function(){dioxus.send(null)},7000)")
-                .await
-                .ok();
-            let next = (*header_idx.peek() + 1) % HEADER_STRINGS.len();
-            header_idx.set(next);
-        }
+    // Rotate subtitle every 7 s.
+    //
+    // WHY use_effect + spawn instead of use_future:
+    // use_future re-spawns its future on every re-render when its closure
+    // captures a reactive signal. header_idx.set() inside the loop triggered
+    // a re-render → re-spawn → another timer fires → another set() → infinite
+    // spawn cascade. On WASM's single-threaded executor that saturated the JS
+    // event loop (dead refresh, blank page, slow tab close).
+    //
+    // use_effect with no reactive reads in its body runs ONCE on mount and
+    // never re-runs. The spawn() inside it creates exactly one long-lived async
+    // task for the entire component lifetime, stopping the cascade entirely.
+    //
+    // dioxus.send() is still required to resolve eval.await — a bare
+    // setTimeout without calling dioxus.send() blocks the Rust future forever.
+    use_effect(move || {
+        spawn(async move {
+            loop {
+                document::eval("setTimeout(function(){dioxus.send(null)},7000)")
+                    .await
+                    .ok();
+                let next = (*header_idx.peek() + 1) % HEADER_STRINGS.len();
+                header_idx.set(next);
+            }
+        });
     });
 
     let is_muted_val = *is_muted.read();
