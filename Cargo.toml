@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["server", "ui", "portfolio_scene"]
+members = ["ui", "portfolio_scene"]
 
 [workspace.package]
 edition = "2021"

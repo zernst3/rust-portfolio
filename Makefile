@@ -30,9 +30,11 @@ check:
 	cargo test --workspace
 
 # Serve fullstack dev server via dx CLI.
-# Dioxus 0.7: "fullstack" is a feature flag on the dioxus workspace dep (already
-# enabled). The platform for a fullstack web app is `web` — dx builds the SSR
-# server + the WASM hydration bundle + serves both with hot-reload.
+# After v0.1-restructure-fullstack: server host code merged into `ui` crate.
+# Target-based gating: [target.'cfg(not(target_arch="wasm32"))'.dependencies]
+# ensures server deps (axum, tokio, reqwest) are excluded from the wasm32 bundle
+# automatically — no @server/--features flags needed.
+# Per PORT-FULLSTACK-1.
 .PHONY: serve
 serve:
-	dx serve --platform web --package server
+	dx serve --platform web --package ui

@@ -10,7 +10,53 @@ repository.workspace = true
 [lints]
 workspace = true
 
+# web feature enables dioxus/web for the WASM hydration bundle.
+# server-only deps live in [target.'cfg(not(target_arch="wasm32"))'.dependencies]
+# so Cargo excludes them for wasm32 automatically — no dx feature-flag magic needed.
+# Per PORT-FULLSTACK-1.
+[features]
+default = []
+web = ["dioxus/web"]
+
+[lib]
+name = "ui"
+path = "src/lib.rs"
+
+[[bin]]
+name = "portfolio"
+path = "src/main.rs"
+
+# Integration tests use build_router() which is server-only code; since they
+# run on native (not wasm32), the server deps are available automatically via
+# [target.cfg] below — no required-features needed.
+[[test]]
+name = "contact"
+path = "tests/contact.rs"
+
+[[test]]
+name = "pageview"
+path = "tests/pageview.rs"
+
 [dependencies]
+# Always compiled (both native and wasm32)
 dioxus = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# thiserror compiles for wasm32 harmlessly; used by dto.rs + mailgun.rs
+thiserror = { workspace = true }
+
+# Server-only deps — Cargo excludes these for wasm32 automatically.
+# No dx @server/--features magic required; the target cfg handles it.
+# `dioxus = { features = ["server"] }` merged here to add the server feature
+# only on native (dioxus/server pulls in mio/tokio which break wasm32 builds).
+# Per PORT-FULLSTACK-1.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+dioxus = { workspace = true, features = ["server"] }
+axum = { workspace = true }
+tokio = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+reqwest = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }

@@ -3,6 +3,22 @@ pub mod components;
 pub mod contexts;
 pub mod routes;
 
+// Server-only modules — excluded for wasm32 via target cfg.
+// Per PORT-FULLSTACK-1: same crate compiles twice; target-based gating ensures
+// axum / tokio / reqwest never enter the wasm32 dependency graph.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod dto;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod handlers;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod mailgun;
+#[cfg(not(target_arch = "wasm32"))]
+mod server;
+
+/// Re-export so `main.rs` and integration tests can call `ui::build_router()`.
+#[cfg(not(target_arch = "wasm32"))]
+pub use server::build_router;
+
 use dioxus::prelude::*;
 
 use contexts::audio::provide_audio_context;

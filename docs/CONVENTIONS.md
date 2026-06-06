@@ -43,7 +43,7 @@ The entire stack ships as one Rust binary. Axum's root `Router` mounts: the Diox
 
 **Why:** agora-rs MONOLITH-1 applies verbatim. No new infrastructure cost; one deploy artifact; no cross-service auth or networking.
 
-**How to apply:** new functionality goes in this binary. If a future feature genuinely needs different scaling characteristics, route to Zach per `orch-one-way-door-1` (it's a structural change).
+**How to apply:** new functionality goes in this binary — in the `ui` crate (the fullstack target, post-v0.1-restructure-fullstack). The `ui` crate owns the server entry, the Dioxus App component, and the `/api/*` handlers under `#[cfg(feature = "server")]` guards. The `portfolio_scene` crate (Bevy WASM) is a separate compile unit but still served by the same binary via `ServeDir`. If a future feature genuinely needs different scaling characteristics, route to Zach per `orch-one-way-door-1` (it's a structural change).
 
 ---
 
@@ -205,3 +205,51 @@ All framer-motion page transitions and entrance animations port to CSS `@keyfram
 **Alternatives considered:**
 - `dioxus-motion` crate — rejected per decision #4 (less mature, some animations need CSS fallback anyway).
 - Inline JS `requestAnimationFrame` helpers — valid for imperative animation (e.g. audio-cue timing per decision #4), but overkill for simple entrance fades.
+
+---
+
+## PORT-FULLSTACK-1: One crate compiles twice via target-based gating
+
+This repo's fullstack crate (`ui`) compiles to two targets from the same
+source tree:
+
+- **Native (`aarch64-apple-darwin` or whatever host):** SSR server + Axum
+  router + Mailgun client. All deps from
+  `[target.'cfg(not(target_arch = "wasm32"))'.dependencies]` are included.
+- **WASM (`wasm32-unknown-unknown`):** Client hydration via
+  `dioxus::launch(App)`. Server deps (axum, tokio, reqwest, mio) are
+  automatically excluded by Cargo's platform resolution.
+
+**Why target-based gating (not feature flags):** `dx serve` builds the WASM
+bundle WITH any `--features` flags passed to the server build (the `@server`
+and `@client` subcommands add features additively, not exclusively). Feature-
+based gating therefore cannot prevent server deps from leaking into the WASM
+build when `dx` is driving the compilation. Cargo's `[target.cfg]` mechanism
+is immune to this — Cargo resolves target-conditional deps based on the actual
+compilation target, not on feature flags passed by the build tool.
+
+**The `dioxus/server` activation pattern:** `dioxus` is declared in BOTH
+`[dependencies]` (base features: `["fullstack", "router"]`) AND in
+`[target.'cfg(not(target_arch = "wasm32"))'.dependencies]` (with
+`features = ["server"]`). Cargo merges duplicate dep entries by unioning their
+feature sets. Result: native builds get `dioxus/server` (needed for
+`render_handler`, `FullstackState`, `ServeConfig`); wasm32 builds do not.
+
+**How to apply:**
+- Server-only modules: `#[cfg(not(target_arch = "wasm32"))]`
+- Server-only main entry: same guard on the `#[tokio::main] async fn main()`
+- WASM hydration entry: `#[cfg(target_arch = "wasm32")] fn main() { dioxus::launch(App); }`
+- New server-side deps: add to `[target.'cfg(not(target_arch="wasm32"))'.dependencies]`
+- Do NOT add native-only deps to `[workspace.dependencies]` and never to `[dependencies]`
+  in this crate without a target guard (they will break the wasm32 build)
+- `make serve` invokes `dx serve --platform web --package ui` — no `@server`/`@client` flags
+
+**Alternatives considered:**
+- `[features] server = [...]` with `#[cfg(feature = "server")]` — rejected because
+  `dx serve @server --features server` leaks the feature into the WASM build.
+  Discovered on 2026-06-05 when mio compile errors persisted despite the guard.
+- `dioxus::serve` (Pattern A from docs) — rejected because it's new API surface
+  not verified against existing integration tests; per PORT-ROBUST-1 the working
+  `FullstackState` + `render_handler` chain is preferred.
+- Adding `"server"` to the workspace dioxus dep — rejected because `dioxus/server`
+  pulls in a tokio dep that includes `mio`, which doesn't compile for wasm32.

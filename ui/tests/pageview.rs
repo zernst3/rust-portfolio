@@ -1,6 +1,7 @@
 //! Integration tests for POST /api/pageview.
 //!
 //! PROC-REGRESSION-TEST-1: spins up the real Axum app via tower::ServiceExt::oneshot.
+//! Requires `--features server` (declared via required-features in Cargo.toml).
 
 use axum::{
     body::Body,
@@ -18,7 +19,7 @@ async fn pageview_without_mailgun_returns_503() -> anyhow::Result<()> {
     std::env::remove_var("MAILGUN_DOMAIN");
     std::env::remove_var("MAILGUN_BASE_URL");
     // With no Mailgun config the handler returns 503. 204 requires staging creds.
-    let app = server::build_router();
+    let app = ui::build_router();
     let response = app
         .oneshot(
             Request::builder()
@@ -38,7 +39,7 @@ async fn pageview_ignores_body() -> anyhow::Result<()> {
     std::env::remove_var("MAILGUN_DOMAIN");
     std::env::remove_var("MAILGUN_BASE_URL");
     // Body is ignored (PORT-API-2). Handler returns 503 without Mailgun config.
-    let app = server::build_router();
+    let app = ui::build_router();
     let response = app
         .oneshot(
             Request::builder()
@@ -76,7 +77,7 @@ async fn pageview_with_mock_mailgun_succeeds() -> anyhow::Result<()> {
     std::env::set_var("MAILGUN_DOMAIN", "test.mailgun.org");
     std::env::set_var("MAILGUN_BASE_URL", &base_url);
 
-    let app = server::build_router();
+    let app = ui::build_router();
     let response = app
         .oneshot(
             Request::builder()
@@ -104,7 +105,7 @@ async fn pageview_when_mailgun_errors_returns_503() -> anyhow::Result<()> {
     std::env::set_var("MAILGUN_DOMAIN", "test.mailgun.org");
     std::env::set_var("MAILGUN_BASE_URL", &base_url);
 
-    let app = server::build_router();
+    let app = ui::build_router();
     let response = app
         .oneshot(
             Request::builder()

@@ -8,6 +8,8 @@ A full-stack Rust port of Zach Ernst's portfolio site (zachary-ernst.dev). The c
 
 This port collapses both into a **single Rust binary** built on **Axum + Dioxus Fullstack + Bevy**. The new repo is `~/Documents/Repos/rust-portfolio/`.
 
+**Workspace shape (post v0.1-restructure-fullstack, 2026-06-05):** two crates — `ui` (the unified fullstack crate: server host code + Dioxus UI + /api handlers, target-gated via `#[cfg(not(target_arch = "wasm32"))]` per PORT-FULLSTACK-1) and `portfolio_scene` (Bevy WASM background scene). The original `server` crate was merged into `ui`; there is no longer a separate `server` workspace member.
+
 The current site's behavior is the spec. The bot's job is to preserve user-visible behavior and aesthetic exactly while moving the implementation to Rust.
 
 ## Locked decisions
