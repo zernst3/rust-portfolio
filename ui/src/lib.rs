@@ -22,7 +22,7 @@ mod server;
 
 /// Re-export so `main.rs` and integration tests can call `ui::build_router()`.
 #[cfg(not(target_arch = "wasm32"))]
-pub use server::build_router;
+pub use server::{api_router, build_router};
 
 use dioxus::prelude::*;
 

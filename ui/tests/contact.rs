@@ -26,7 +26,7 @@ async fn contact_valid_payload_without_mailgun_returns_503() -> anyhow::Result<(
     std::env::remove_var("MAILGUN_DOMAIN");
     std::env::remove_var("MAILGUN_BASE_URL");
     // With no Mailgun config the handler returns 503. 204 requires staging creds.
-    let app = ui::build_router();
+    let app = ui::api_router();
     let response = app
         .oneshot(
             Request::builder()
@@ -42,7 +42,7 @@ async fn contact_valid_payload_without_mailgun_returns_503() -> anyhow::Result<(
 
 #[tokio::test]
 async fn contact_invalid_email_returns_unprocessable() -> anyhow::Result<()> {
-    let app = ui::build_router();
+    let app = ui::api_router();
     let body = Body::from(r#"{"name":"X","email":"not-an-email","subject":"S","message":"M"}"#);
     let response = app
         .oneshot(
@@ -59,7 +59,7 @@ async fn contact_invalid_email_returns_unprocessable() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn contact_missing_field_returns_unprocessable() -> anyhow::Result<()> {
-    let app = ui::build_router();
+    let app = ui::api_router();
     let body = Body::from(r#"{"name":"X","email":"x@example.com","subject":"S"}"#);
     let response = app
         .oneshot(
@@ -100,7 +100,7 @@ async fn contact_with_mock_mailgun_succeeds() -> anyhow::Result<()> {
     std::env::set_var("MAILGUN_DOMAIN", "test.mailgun.org");
     std::env::set_var("MAILGUN_BASE_URL", &base_url);
 
-    let app = ui::build_router();
+    let app = ui::api_router();
     let response = app
         .oneshot(
             Request::builder()
@@ -129,7 +129,7 @@ async fn contact_when_mailgun_errors_returns_503() -> anyhow::Result<()> {
     std::env::set_var("MAILGUN_DOMAIN", "test.mailgun.org");
     std::env::set_var("MAILGUN_BASE_URL", &base_url);
 
-    let app = ui::build_router();
+    let app = ui::api_router();
     let response = app
         .oneshot(
             Request::builder()
