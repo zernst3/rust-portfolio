@@ -29,8 +29,9 @@ output "container_app_fqdn" {
 }
 
 output "custom_domain_verification_id" {
-  description = "Value for the asuid.<domain> TXT record when binding a custom domain."
+  description = "Value for the asuid.<domain> TXT record when binding a custom domain. Read with: terraform output -raw custom_domain_verification_id"
   value       = azurerm_container_app.main.custom_domain_verification_id
+  sensitive   = true
 }
 
 output "key_vault_name" {
