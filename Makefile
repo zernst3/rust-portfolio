@@ -37,6 +37,16 @@ check:
 # ensures server deps (axum, tokio, reqwest) are excluded from the wasm32 bundle
 # automatically — no @server/--features flags needed.
 # Per PORT-FULLSTACK-1.
+#
+# RELEASE by default: the debug WASM bundle is ~50MB and JIT-compiling it on the
+# browser main thread freezes the tab for 30-90s (looks like a hang). The release
+# bundle is ~2MB and loads instantly. Release rebuilds are slower (~100s) — that
+# is the deliberate tradeoff until the bundle-size story improves.
+#
+# SELF-CLEANING: kills any stale `dx serve` / spawned server first. A leftover
+# dx serve holds port 8080; a new invocation then errors in ~1s and the browser
+# keeps showing the OLD build (the "white screen is back" trap). Always kill first.
 .PHONY: serve
 serve:
-	dx serve --platform web --package ui
+	-pkill -f "dx serve" 2>/dev/null; pkill -f "target/dx" 2>/dev/null; sleep 1
+	dx serve --platform web --release --package ui
