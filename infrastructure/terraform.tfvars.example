@@ -7,7 +7,7 @@ location            = "eastus"
 resource_group_name = "MyPortfolioSite"
 
 # Mailgun sending domain (not secret).
-mailgun_domain = "mg.zachary-ernst.com"
+mailgun_domain = "mg.zachary-ernst.dev"
 
 # Mailgun API key — DO NOT put it here. Provide it as an environment variable:
 #   export TF_VAR_mailgun_api_key="key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

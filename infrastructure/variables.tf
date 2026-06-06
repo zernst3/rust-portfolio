@@ -40,7 +40,7 @@ variable "mailgun_api_key" {
 }
 
 variable "mailgun_domain" {
-  description = "Mailgun sending domain (e.g. mg.zacharyernst.com). Not secret; passed as a plain container env var."
+  description = "Mailgun sending domain (e.g. mg.zachary-ernst.dev). Not secret; passed as a plain container env var."
   type        = string
 }
 

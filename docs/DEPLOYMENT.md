@@ -167,17 +167,17 @@ Container Apps issues a free managed certificate once the domain is validated.
    ```
 2. Create DNS records at your registrar (use a subdomain like `www`; apex
    domains need an ALIAS/ANAME record instead of CNAME):
-   - `CNAME`  `www.zacharyernst.com`  →  `<container_app_fqdn>`
-   - `TXT`    `asuid.www.zacharyernst.com`  →  `<custom_domain_verification_id>`
+   - `CNAME`  `www.zachary-ernst.dev`  →  `<container_app_fqdn>`
+   - `TXT`    `asuid.www.zachary-ernst.dev`  →  `<custom_domain_verification_id>`
 3. Add + bind the hostname (Azure then issues the managed cert automatically):
    ```bash
    RG=$(terraform output -raw resource_group_name)
    APP=$(terraform output -raw container_app_name)
    ENV="cae-rust-portfolio-prod"   # or: az containerapp show -n $APP -g $RG --query properties.managedEnvironmentId
 
-   az containerapp hostname add  --name "$APP" --resource-group "$RG" --hostname www.zacharyernst.com
+   az containerapp hostname add  --name "$APP" --resource-group "$RG" --hostname www.zachary-ernst.dev
    az containerapp hostname bind --name "$APP" --resource-group "$RG" \
-     --hostname www.zacharyernst.com --environment "$ENV" --validation-method CNAME
+     --hostname www.zachary-ernst.dev --environment "$ENV" --validation-method CNAME
    ```
    The managed certificate provisions in a few minutes; HTTPS then serves on the
    custom domain at no cost.
