@@ -52,6 +52,7 @@
 
 #Home .menuContainer a li,
 #Home .menuContainer div li {
+  box-sizing: border-box;
   padding: 0 20px;
   /* Compressed from 75px to fit the 5th menu item (AI Architecture) within
      the menu container without overflowing into the title above. */

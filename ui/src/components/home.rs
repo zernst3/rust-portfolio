@@ -115,8 +115,13 @@ pub fn Home() -> Element {
     let mut menu_open = mobile_menu.is_open;
 
     let mut header_idx: Signal<usize> = use_signal(|| 0);
-    let mut highlight: Signal<Option<ItemPos>> = use_signal(|| None);
+    let highlight: Signal<ItemPos> = use_signal(|| ItemPos {
+        top: 0.0,
+        height: 0.0,
+    });
     let mut links_open: Signal<bool> = use_signal(|| false);
+    let mut subtitle_opacity: Signal<f64> = use_signal(|| 1.0);
+    let mut highlight_on: Signal<bool> = use_signal(|| false);
 
     // Rotate subtitle every 7 s.
     //
@@ -131,16 +136,32 @@ pub fn Home() -> Element {
     // never re-runs. The spawn() inside it creates exactly one long-lived async
     // task for the entire component lifetime, stopping the cascade entirely.
     //
-    // dioxus.send() is still required to resolve eval.await — a bare
-    // setTimeout without calling dioxus.send() blocks the Rust future forever.
+    // ROOT-CAUSE FIX 2026-06-06: the original code used:
+    //   document::eval("setTimeout(function(){dioxus.send(null)},7000)").await
+    //
+    // The eval PROMISE_WRAPPER wraps JS in an async IIFE that calls dioxus.close()
+    // IMMEDIATELY AFTER the JS code runs — not after the timeout fires. So
+    // dioxus.close() fires synchronously right after setTimeout() is registered,
+    // the outer promise resolves on the next microtask tick, and the Rust .await
+    // completes immediately. The loop then runs at microtask speed (~60fps),
+    // saturating the JS event loop and permanently blocking the main thread.
+    //
+    // FIX: Use `await` inside the eval JS so the IIFE itself awaits the timer
+    // before dioxus.close() is called. The outer promise resolves only after
+    // the 7-second timer fires, giving the correct delay.
     use_effect(move || {
         spawn(async move {
             loop {
-                document::eval("setTimeout(function(){dioxus.send(null)},7000)")
+                document::eval("await new Promise(function(r){setTimeout(r,3000)});")
+                    .await
+                    .ok();
+                subtitle_opacity.set(0.0);
+                document::eval("await new Promise(function(r){setTimeout(r,400)});")
                     .await
                     .ok();
                 let next = (*header_idx.peek() + 1) % HEADER_STRINGS.len();
                 header_idx.set(next);
+                subtitle_opacity.set(1.0);
             }
         });
     });
@@ -149,6 +170,9 @@ pub fn Home() -> Element {
     let is_open_val = *menu_open.read();
     let current_idx = *header_idx.read();
     let current_highlight = highlight.read().clone();
+    let highlight_on_val = *highlight_on.read();
+    let highlight_bar_opacity: f64 = if highlight_on_val { 1.0 } else { 0.0 };
+    let subtitle_opacity_val = *subtitle_opacity.read();
     let links_open_val = *links_open.read();
 
     rsx! {
@@ -190,18 +214,19 @@ pub fn Home() -> Element {
                             div {
                                 class: "pageLinks",
                                 onmouseleave: move |_| {
-                                    highlight.set(None);
+                                    highlight_on.set(false);
                                     is_hovering.set(false);
                                 },
 
                                 // Absolutely-positioned highlight bar; CSS handles color/border.
-                                if let Some(ref pos) = current_highlight {
-                                    div {
-                                        class: "nav-highlight",
-                                        style: "top: {pos.top}px; height: {pos.height}px; \
-                                                transition: top 0.2s cubic-bezier(0.22,1,0.36,1), \
-                                                            height 0.1s ease-out; opacity: 1;",
-                                    }
+                                div {
+                                    class: "nav-highlight",
+                                    style: "top: {current_highlight.top}px; \
+                                            height: {current_highlight.height}px; \
+                                            opacity: {highlight_bar_opacity}; \
+                                            transition: top 0.28s cubic-bezier(0.22,1,0.36,1), \
+                                                        height 0.28s cubic-bezier(0.22,1,0.36,1), \
+                                                        opacity 0.2s ease;",
                                 }
 
                                 for (idx, item) in NAV_ITEMS.iter().enumerate() {
@@ -219,10 +244,8 @@ pub fn Home() -> Element {
                                             onmouseenter: move |_| {
                                                 is_hovering.set(true);
                                                 let mut hl = highlight;
+                                                let mut hl_on = highlight_on;
                                                 spawn(async move {
-                                                    // dioxus.send() required — eval.await blocks
-                                                    // until JS calls dioxus.send(). `return` alone
-                                                    // does not resolve the Rust future.
                                                     let js = format!(
                                                         "(function(){{\
                                                           var items=document.querySelectorAll(\
@@ -237,11 +260,10 @@ pub fn Home() -> Element {
                                                                         height:er.height}});\
                                                         }})()"
                                                     );
-                                                    if let Ok(result) = document::eval(&js)
-                                                        .join::<Option<ItemPos>>()
-                                                        .await
-                                                    {
-                                                        hl.set(result);
+                                                    let mut ev = document::eval(&js);
+                                                    if let Ok(Some(pos)) = ev.recv::<Option<ItemPos>>().await {
+                                                        hl.set(pos);
+                                                        hl_on.set(true);
                                                     }
                                                 });
                                                 if !*is_muted.peek() {
@@ -332,12 +354,11 @@ pub fn Home() -> Element {
                             div {
                                 style: "position: relative; height: 40px; width: 100%; \
                                         display: flex; justify-content: center;",
-                                // Re-keyed on index change → CSS fade-in re-fires each rotation.
                                 h3 {
-                                    key: "{current_idx}",
-                                    class: "header-fade-in",
                                     style: "position: absolute; text-align: center; \
-                                            margin: 0; width: 100%;",
+                                            margin: 0; width: 100%; \
+                                            opacity: {subtitle_opacity_val}; \
+                                            transition: opacity 0.4s ease-in-out;",
                                     "{HEADER_STRINGS[current_idx]}"
                                 }
                             }

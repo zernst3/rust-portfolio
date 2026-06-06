@@ -48,5 +48,5 @@ check:
 # keeps showing the OLD build (the "white screen is back" trap). Always kill first.
 .PHONY: serve
 serve:
-	-pkill -f "dx serve" 2>/dev/null; pkill -f "target/dx" 2>/dev/null; sleep 1
+	-pkill -9 -f "dx serve" 2>/dev/null; pkill -9 -f "target/dx" 2>/dev/null; lsof -ti:8080 | xargs -r kill -9 2>/dev/null; sleep 1
 	dx serve --platform web --release --package ui
