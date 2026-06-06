@@ -60,3 +60,7 @@ reqwest = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 anyhow = { workspace = true }
+# Reads IP + PORT env vars that `dx serve` injects so the server binary binds
+# the port dx expects rather than a hardcoded 3000. Without this, dx proxies to
+# a different port and gets ECONNREFUSED ("Backend not ready after 30s").
+dioxus-cli-config = { workspace = true }

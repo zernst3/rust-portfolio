@@ -58,6 +58,13 @@ serde_json = "1"
 # HTTP client for Mailgun.
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 
+# Dioxus CLI config — exposes `fullstack_address_or_localhost()` so the server
+# binary reads the IP/PORT env vars that `dx serve` injects at launch, rather
+# than hardcoding a port that may conflict with dx's proxy assignment.
+# Already pulled in transitively by dioxus/server; declaring it explicitly gives
+# us a direct `use dioxus_cli_config::fullstack_address_or_localhost` import.
+dioxus-cli-config = "0.7"
+
 # Tracing for observability.
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

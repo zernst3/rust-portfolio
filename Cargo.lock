@@ -5710,6 +5710,7 @@ dependencies = [
  "anyhow",
  "axum",
  "dioxus",
+ "dioxus-cli-config",
  "reqwest",
  "serde",
  "serde_json",

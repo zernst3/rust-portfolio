@@ -6,7 +6,12 @@
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
+    // `dx serve` injects IP + PORT env vars telling the server binary which
+    // address/port the CLI proxy is expecting it to bind. Hardcoding 3000 here
+    // causes ECONNREFUSED ("Backend not ready after 30s") because dx assigns a
+    // different port. `fullstack_address_or_localhost()` reads those env vars
+    // and falls back to 127.0.0.1:8080 when running standalone (production).
+    let addr = dioxus_cli_config::fullstack_address_or_localhost();
     let listener = tokio::net::TcpListener::bind(addr).await?;
     tracing::info!("listening on {addr}");
     axum::serve(listener, ui::build_router()).await?;
