@@ -3,9 +3,10 @@
 ###############################################################################
 # Builder — compile the Dioxus fullstack bundle (server binary + public/).
 ###############################################################################
-# Latest stable Rust on Debian bookworm; glibc here matches the bookworm-slim
-# runtime so the dynamically-linked server binary loads without surprises.
-FROM rust:bookworm AS builder
+# Debian trixie (glibc 2.41). Required because the prebuilt dx 0.7.9 binary is
+# linked against GLIBC_2.39 — bookworm's 2.36 is too old and dx won't run. The
+# runtime stage is also trixie so the server binary's glibc matches.
+FROM rust:trixie AS builder
 
 # wasm target for the hydration bundle (rust-toolchain.toml also requests it).
 RUN rustup target add wasm32-unknown-unknown
@@ -29,7 +30,7 @@ RUN dx bundle --platform web --release --package ui
 ###############################################################################
 # Runtime — slim image with just the binary, public/, and repo assets/.
 ###############################################################################
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 
 # ca-certificates: rustls needs the system trust store to verify Mailgun's TLS.
 # tini: proper PID-1 signal handling for clean container shutdown.
