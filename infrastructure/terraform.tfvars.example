@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars and adjust. Do NOT commit real secrets.
+# (terraform.tfvars is gitignored.)
+
+project             = "rust-portfolio"
+environment         = "prod"
+location            = "eastus"
+resource_group_name = "MyPortfolioSite"
+
+# Mailgun sending domain (not secret).
+mailgun_domain = "mg.example.com"
+
+# Mailgun API key — DO NOT put it here. Provide it as an environment variable:
+#   export TF_VAR_mailgun_api_key="key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# mailgun_api_key = "..."   # leave commented; set via TF_VAR_ instead
+
+# container_image: leave at the default placeholder. The GitHub Actions deploy
+# pushes the real image to ACR and points the app at it.

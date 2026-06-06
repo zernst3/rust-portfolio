@@ -45,6 +45,21 @@ serde_json = { workspace = true }
 # thiserror compiles for wasm32 harmlessly; used by dto.rs + mailgun.rs
 thiserror = { workspace = true }
 
+# Browser-only deps for the Rust/WebGL water-cinemagraph background (web-sys).
+# wasm32-only; native/server builds don't pull these. Versions pinned to the
+# wasm-bindgen already in the graph (via dioxus-web) so there's one shared ABI.
+# The GLSL shader source + auto-generated wasm-bindgen glue are the only non-Rust
+# artifacts here (both irreducible on the web).
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.122"
+js-sys = "0.3.99"
+web-sys = { version = "0.3.99", features = [
+    "Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement",
+    "HtmlImageElement", "EventTarget", "CssStyleDeclaration", "MediaQueryList",
+    "WebGlRenderingContext", "WebGlProgram", "WebGlShader", "WebGlUniformLocation",
+    "WebGlBuffer", "WebGlTexture",
+] }
+
 # Server-only deps — Cargo excludes these for wasm32 automatically.
 # No dx @server/--features magic required; the target cfg handles it.
 # `dioxus = { features = ["server"] }` merged here to add the server feature

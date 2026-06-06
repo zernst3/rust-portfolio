@@ -46,8 +46,9 @@ pub fn ProfessionalExperience() -> Element {
     let mut bar_top: Signal<f64> = use_signal(|| 0.0);
     let mut bar_height: Signal<f64> = use_signal(|| 0.0);
     let mut bar_visible: Signal<bool> = use_signal(|| false);
-    // Preview fade-in opacity. Driven on selection (see open_experience).
-    let mut preview_opacity: Signal<f64> = use_signal(|| 1.0);
+    // Preview entrance: toggled off->on around each selection to force a fresh
+    // mount, so the CSS fade-in (.preview-anim) restarts from zero every open.
+    let mut preview_shown: Signal<bool> = use_signal(|| true);
 
     // Auto-select "scopeAndTrajectory" on desktop on mount.
     //
@@ -103,33 +104,32 @@ pub fn ProfessionalExperience() -> Element {
         });
     };
 
-    // Open a sub-experience: play sound, select it, slide the bar, and fade the
-    // preview in. The fade is the opacity-signal pattern (same as the home
-    // subtitle): set opacity 0 SYNCHRONOUSLY with the selection so there's a
-    // single render with the new content already hidden (no flash), then
-    // transition back to 1 after a paint. Simple and reliable — no key-remount,
-    // which is the unreliable approach that made only the first item animate.
+    // Open a sub-experience: sound, select, slide the bar, and replay the
+    // entrance animation. We briefly unmount the preview body (preview_shown
+    // false -> true across a paint) so the .preview-anim keyframe restarts from
+    // zero on every open. A real remount, not a transition from the current
+    // opacity (which only produced an invisible flicker).
     let open_experience = use_callback(move |key: &'static str| {
         if !*audio.is_muted.read() {
             play_sound("/static/sounds/select.mp3", 0.45);
         }
         current.set(Some(key));
         measure_bar(key);
-        preview_opacity.set(0.0);
-        let mut po = preview_opacity;
+        preview_shown.set(false);
+        let mut shown = preview_shown;
         spawn(async move {
-            // Double rAF: guarantee the browser paints opacity:0 before the
-            // transition to 1, so the fade actually plays.
+            // One paint with the body unmounted, then remount so the CSS
+            // keyframe fires fresh.
             document::eval(
                 "await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});});",
             )
             .await
             .ok();
-            po.set(1.0);
+            shown.set(true);
         });
     });
 
-    let preview_opacity_val = *preview_opacity.read();
+    let preview_shown_val = *preview_shown.read();
 
     let bar_style = if *bar_visible.read() {
         format!(
@@ -318,7 +318,8 @@ pub fn ProfessionalExperience() -> Element {
                         // ─── Preview panel ────────────────────────────────────
                         div {
                             class: "preview",
-                            style: "opacity: {preview_opacity_val}; transition: opacity 0.25s ease;",
+                            if preview_shown_val {
+                            div { class: "preview-anim",
                             {match *current.read() {
                                 None => rsx! {
                                     p { class: "empty-preview-prompt empty-preview-prompt-desktop",
@@ -388,6 +389,8 @@ pub fn ProfessionalExperience() -> Element {
                                     }
                                 },
                             }}
+                            }
+                            }
                         }
                     }
                 }

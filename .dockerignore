@@ -1,0 +1,21 @@
+# Build artifacts and VCS — never needed in the build context.
+target
+.git
+.gitignore
+.dioxus
+
+# Things the image doesn't need (keeps the context small + builds fast).
+.github
+infrastructure
+docs
+scripts
+README.md
+AGENTS.md
+*.md
+
+# High-res source photo (8MB). The web-optimized copy lives in assets/images/nyc.jpg.
+NYC.jpg
+
+# macOS noise.
+.DS_Store
+**/.DS_Store

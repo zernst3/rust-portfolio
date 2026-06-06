@@ -27,9 +27,8 @@ use crate::App;
 /// panic.
 ///
 /// Fix: give `/assets` entirely to `serve_static_assets()`.  Serve OUR repo static
-/// files (CSS, images, sounds, Bevy WASM loader) at `/static` instead, by mounting
-/// `ServeDir::new("assets")` (the on-disk dir keeps its name so `make build-bevy`
-/// `--out-dir assets` continues to work) at the `/static` URL prefix.
+/// files (CSS, images, sounds) at `/static` instead, by mounting
+/// `ServeDir::new("assets")` at the `/static` URL prefix.
 ///
 /// All `/assets/...` hrefs in lib.rs and component files have been updated to
 /// `/static/...` to match this new prefix.  dx's `/assets/...` references in its
@@ -42,9 +41,8 @@ pub fn build_router() -> Router {
     let router: Router<FullstackState> = Router::new()
         .route("/api/contact", post(crate::handlers::contact::contact))
         .route("/api/pageview", post(crate::handlers::pageview::pageview))
-        // Repo static files: CSS, images, sounds, Bevy WASM loader.
+        // Repo static files: CSS, images, sounds, the NYC photo.
         // Mounted at /static to leave /assets free for dx's serve_static_assets().
-        // On-disk dir is still named `assets/`; only the URL prefix changed.
         .nest_service("/static", ServeDir::new("assets"))
         // Let dx own /assets (and any other subdirs it creates in public/).
         // Registers nest_service("/assets", ...) from public/assets/ at runtime.

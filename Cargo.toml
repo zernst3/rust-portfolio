@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["ui", "portfolio_scene"]
+members = ["ui"]
 
 [workspace.package]
 edition = "2021"
@@ -31,22 +31,6 @@ tokio = { version = "1", features = ["full"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip"] }
 
-# Bevy — fullscreen background scene rendered to a canvas behind Dioxus DOM.
-# Pinned to the latest stable 0.14 line; bot reverse-engineers the current
-# three.js scene into Bevy primitives as the v0.1 baseline.
-bevy = { version = "0.14", default-features = false, features = [
-    "bevy_winit",
-    "bevy_render",
-    "bevy_core_pipeline",
-    "bevy_pbr",
-    "bevy_asset",
-    "webgl2",
-    "x11",
-    "tonemapping_luts",
-    "ktx2",
-    "zstd",
-] }
-
 # Errors — thiserror per crate per RUST-DOMAIN-4. anyhow only at app entry.
 thiserror = "2"
 anyhow = "1"
@@ -68,7 +52,3 @@ dioxus-cli-config = "0.7"
 # Tracing for observability.
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
-
-# Bevy WASM entry point and JS interop. Required for the portfolio_scene crate
-# (cdylib) to be loadable from the browser via wasm-pack / wasm-bindgen-cli.
-wasm-bindgen = "0.2"

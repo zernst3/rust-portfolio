@@ -104,6 +104,18 @@
 
 /* Sliding selection bar — same Halo-style amber highlight as the home menu.
    Rests on the selected experience and previews whatever you hover. */
+/* Preview entrance: replays on every open via a forced remount (see
+   professional_experience.rs preview_shown). Fade + slight rise, matching the
+   page-transition feel. */
+@keyframes preview-in-kf {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.preview-anim {
+  animation: preview-in-kf 0.35s ease-out;
+  width: 100%;
+}
+
 .picker-highlight {
   position: absolute;
   left: 0;
@@ -183,7 +195,13 @@
   /* Ultrawide constraint */
   padding: 20px 2rem 20px 20px;
   box-sizing: border-box;
-  overflow: hidden; /* Clip any content that still tries to exceed 1fr */
+  overflow-x: hidden; /* Clip any content that still tries to exceed 1fr */
+  /* Vertically center the preview content; `safe` falls back to top-aligned
+     (and scrolls) when the content is taller than the panel, so nothing clips. */
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  overflow-y: auto;
 }
 
 .center {

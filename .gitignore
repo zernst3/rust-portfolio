@@ -18,9 +18,3 @@ dist/
 
 # macOS noise.
 .DS_Store
-
-# Generated Bevy WASM bundle (produced by `make build-bevy`, regenerable)
-assets/portfolio_scene.js
-assets/portfolio_scene.d.ts
-assets/portfolio_scene_bg.wasm
-assets/portfolio_scene_bg.wasm.d.ts

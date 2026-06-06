@@ -61,7 +61,7 @@ static LINK_ITEMS: &[LinkItem] = &[
 
 static HEADER_STRINGS: &[&str] = &[
     "Technical Lead @ S&P Global Market Intelligence | Enterprise Architecture",
-    "Creator & Lead Engineer | Building The New Agora (Independent Venture)",
+    "Creator & Lead Engineer | Building The New Agora (Independent Project)",
     "AI-native development for clean, consistent and scalable code",
     "Aligning distributed contributors to one architecture across time zones",
     "Building robust digital infrastructure for the systems that shape our environment",
@@ -100,7 +100,8 @@ const ICON_INFO: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 
 /// - Zustand `useAudioStore` → `AudioState` context (rust-dioxus-3/4).
 /// - `MobileMenuContext` → `MobileMenuState` context (rust-dioxus-3/4).
 /// - Header rotation: `use_future` timer (client-only; SSR renders header[0]).
-/// - `useAudioAnalyzer` omitted — feeds the Bevy background (deferred v0.1-bevy).
+/// - `useAudioAnalyzer` omitted — the animated background is the WebGL water
+///   cinemagraph (background.rs), which doesn't consume the audio analyser.
 ///
 /// Per rust-dioxus-2, rust-dioxus-7, rust-dioxus-8, PORT-CSS-1, decision #4.
 #[component]

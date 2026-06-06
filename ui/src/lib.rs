@@ -3,6 +3,11 @@ pub mod components;
 pub mod contexts;
 pub mod routes;
 
+// WebGL water-cinemagraph background — wasm32-only (uses web-sys). Native/server
+// builds don't compile it; the use_effect call site is cfg-gated to match.
+#[cfg(target_arch = "wasm32")]
+mod background;
+
 // Server-only modules — excluded for wasm32 via target cfg.
 // Per PORT-FULLSTACK-1: same crate compiles twice; target-based gating ensures
 // axum / tokio / reqwest never enter the wasm32 dependency graph.
@@ -39,23 +44,19 @@ pub fn App() -> Element {
     provide_audio_context();
     provide_mobile_menu_context();
 
-    // Load Bevy WASM scene on first client render (no-op on SSR per PORT-BEVY-1).
-    // TEMPORARILY DISABLED 2026-06-05 to bisect a main-thread freeze (white page,
-    // dead refresh, slow tab close). If the app is responsive with this off, the
-    // Bevy event loop / 25MB Bevy bundle is the culprit. Re-enable once isolated.
-    // Bevy files are served at /static/ (repo static files moved off /assets to
-    // leave that prefix for dx's hydration bootstrap; see server.rs asset strategy).
-    // use_effect(|| {
-    //     let _ = document::eval(
-    //         "import('/static/portfolio_scene.js')\
-    //          .then(function(m){return m.default();})\
-    //          .catch(function(e){console.warn('Bevy scene unavailable',e);});",
-    //     );
-    // });
+    // Animated water cinemagraph background, authored in Rust (web-sys/WebGL).
+    // Client-only: use_effect runs after hydration (never on SSR / the server
+    // build). Renders the NYC photo into #background-canvas with only the river
+    // animated; fails silently to a static image if WebGL is unavailable.
+    // See background.rs. wasm32-only; the call is a no-op on native builds.
+    use_effect(|| {
+        #[cfg(target_arch = "wasm32")]
+        background::mount();
+    });
 
     rsx! {
         document::Title { "Zachary Ernst" }
-        document::Link { rel: "icon", href: "/static/images/favicon.ico" }
+        document::Link { rel: "icon", r#type: "image/svg+xml", href: "/static/images/favicon.svg" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Stylesheet {
             href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
@@ -100,10 +101,16 @@ pub fn App() -> Element {
             href: "/static/styles/components/ProfessionalExperience/InfrastructureDiagram/InfrastructureDiagram.css"
         }
 
-        // Background canvas — Bevy mounts here per PORT-BEVY-1.
+        // Animated water cinemagraph renders here (WebGL via /static/background.js).
         canvas {
-            id: "bevy-canvas",
-            style: "position:fixed;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none;background:#0a1f1c;"
+            id: "background-canvas",
+            style: "position:fixed;inset:0;z-index:-2;width:100%;height:100%;pointer-events:none;background:#0a1f1c;"
+        }
+        // Dark scrim between the background and the content. Tune the rgba
+        // freely: last value is opacity (0.82 = mostly opaque).
+        div {
+            id: "background-overlay",
+            style: "position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(8,12,16,0.82);"
         }
 
         div { id: "App",

@@ -344,18 +344,39 @@ async function run() {
 
       // CHECK: selecting a sub-experience fades the preview in (opacity
       // transition wired) and settles to 1 (not stuck hidden).
-      const previewFade = await cdp.eval(
-        `(()=>{const p=document.querySelector('.preview');if(!p)return false;` +
-          `return getComputedStyle(p).transitionProperty.includes('opacity');})()`
+      const animName = await cdp.eval(
+        `(()=>{const p=document.querySelector('.preview .preview-anim');` +
+          `return p?getComputedStyle(p).animationName:'';})()`
       );
-      record("preview-fade-style", false, previewFade, ".preview transitions opacity");
-      await cdp.click(pickRect.x, pickRect.y);
-      await sleep(700);
-      const po = await cdp.eval(
-        `(()=>{const p=document.querySelector('.preview');` +
-          `return p?parseFloat(getComputedStyle(p).opacity):-1;})()`
+      record(
+        "preview-anim-style",
+        false,
+        (animName || "").includes("preview-in"),
+        `animation=${animName || "none"}`
       );
-      record("preview-fade-settles", true, po > 0.95, `opacity=${po}`);
+      // Click a DIFFERENT item and probe whether the entrance animation
+      // actually restarts (running + low currentTime), not just that content
+      // appears. This is the desktop "pops in with no animation" check.
+      const azure = await cdp.eval(
+        `(()=>{const it=document.querySelector('[data-exp-key="azureToAWSMigration"]');` +
+          `if(!it)return null;const r=it.getBoundingClientRect();` +
+          `return {x:r.left+r.width/2,y:r.top+r.height/2};})()`
+      );
+      if (azure) {
+        await cdp.click(azure.x, azure.y);
+        await sleep(90);
+        const anim = await cdp.eval(
+          `(()=>{const w=document.querySelector('.preview .preview-anim');if(!w)return 'no-el';` +
+            `var a=w.getAnimations?w.getAnimations():[];if(!a.length)return 'no-anim';` +
+            `return a[0].playState+'@'+Math.round(a[0].currentTime||0)+'ms';})()`
+        );
+        record("preview-anim-fires", true, /running@\d/.test(anim) || /running@0/.test(anim), anim);
+      }
+      const opened = await cdp.eval(
+        `(()=>{const w=document.querySelector('.preview .preview-anim');` +
+          `return !!(w && w.textContent && w.textContent.trim().length>0);})()`
+      );
+      record("preview-opens", true, opened, opened ? "content shown" : "no preview content");
     }
 
     // CHECK: no uncaught exceptions / console errors anywhere above.

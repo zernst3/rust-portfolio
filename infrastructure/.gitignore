@@ -1,0 +1,10 @@
+# Terraform state may contain secrets (e.g. the Mailgun key) — never commit it.
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# Real variable values (use terraform.tfvars.example as the template).
+terraform.tfvars
+*.auto.tfvars
