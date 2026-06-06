@@ -18,7 +18,7 @@ pub fn SingleExperience(props: SingleExperienceProps) -> Element {
 
     let on_back = move |_| {
         if !*audio.is_muted.read() {
-            play_sound("/assets/sounds/woosh2.mp3", 0.1);
+            play_sound("/static/sounds/woosh2.mp3", 0.1);
         }
         props.on_back.call(());
     };

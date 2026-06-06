@@ -242,13 +242,13 @@ pub fn AIArchitecture() -> Element {
                                         class: "tile",
                                         onclick: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                             focused.set(Some(tile_id));
                                         },
                                         onmouseenter: move |_| {
                                             if !is_focused && !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                         },
                                         div {
@@ -292,7 +292,7 @@ pub fn AIArchitecture() -> Element {
                                             class: "back-button",
                                             onclick: move |_| {
                                                 if !*audio.is_muted.read() {
-                                                    play_sound("/assets/sounds/woosh2.mp3", 0.1);
+                                                    play_sound("/static/sounds/woosh2.mp3", 0.1);
                                                 }
                                                 focused.set(None);
                                             },

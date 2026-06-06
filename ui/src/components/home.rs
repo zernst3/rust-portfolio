@@ -211,7 +211,7 @@ pub fn Home() -> Element {
                                         active_class: "active",
                                         onclick: move |_| {
                                             if !*is_muted.peek() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                         },
                                         li {
@@ -252,7 +252,7 @@ pub fn Home() -> Element {
                                                         )
                                                         .await
                                                         .ok();
-                                                        play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                        play_sound("/static/sounds/woosh3.mp3", 0.25);
                                                     });
                                                 }
                                             },
@@ -282,7 +282,7 @@ pub fn Home() -> Element {
                                             onmouseleave: move |_| is_hovering.set(false),
                                             onclick: move |_| {
                                                 if !*is_muted.peek() {
-                                                    play_sound("/assets/sounds/select.mp3", 0.45);
+                                                    play_sound("/static/sounds/select.mp3", 0.45);
                                                 }
                                                 links_open.toggle();
                                             },

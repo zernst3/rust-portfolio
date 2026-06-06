@@ -35,7 +35,7 @@ pub fn ContactMe() -> Element {
             return;
         }
         if !*audio.is_muted.read() {
-            play_sound("/assets/sounds/select.mp3", 0.75);
+            play_sound("/static/sounds/select.mp3", 0.75);
         }
 
         let name_val = name.read().clone();

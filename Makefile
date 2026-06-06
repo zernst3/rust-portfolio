@@ -14,7 +14,9 @@ ASSETS_DIR := assets
 # and _bg.wasm file that the browser can import.
 #
 # Output: assets/portfolio_scene.js + assets/portfolio_scene_bg.wasm
-# Referenced by ui/src/lib.rs via: import('/assets/portfolio_scene.js').then(m => m.default())
+# Served at: /static/portfolio_scene.js (repo static files are at /static/, NOT /assets/).
+# The on-disk dir is still named `assets/` so --out-dir $(ASSETS_DIR) still works.
+# When re-enabled, ui/src/lib.rs imports via: import('/static/portfolio_scene.js').then(m => m.default())
 .PHONY: build-bevy
 build-bevy:
 	cargo build --target wasm32-unknown-unknown -p portfolio_scene --release

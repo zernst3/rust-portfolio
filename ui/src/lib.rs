@@ -43,9 +43,11 @@ pub fn App() -> Element {
     // TEMPORARILY DISABLED 2026-06-05 to bisect a main-thread freeze (white page,
     // dead refresh, slow tab close). If the app is responsive with this off, the
     // Bevy event loop / 25MB Bevy bundle is the culprit. Re-enable once isolated.
+    // Bevy files are served at /static/ (repo static files moved off /assets to
+    // leave that prefix for dx's hydration bootstrap; see server.rs asset strategy).
     // use_effect(|| {
     //     let _ = document::eval(
-    //         "import('/assets/portfolio_scene.js')\
+    //         "import('/static/portfolio_scene.js')\
     //          .then(function(m){return m.default();})\
     //          .catch(function(e){console.warn('Bevy scene unavailable',e);});",
     //     );
@@ -53,7 +55,7 @@ pub fn App() -> Element {
 
     rsx! {
         document::Title { "Zachary Ernst" }
-        document::Link { rel: "icon", href: "/assets/images/favicon.ico" }
+        document::Link { rel: "icon", href: "/static/images/favicon.ico" }
         document::Link { rel: "preconnect", href: "https://fonts.gstatic.com" }
         document::Stylesheet {
             href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
@@ -64,38 +66,38 @@ pub fn App() -> Element {
         document::Stylesheet {
             href: "https://fonts.googleapis.com/css2?family=Aldrich&family=Rajdhani:wght@300;400;500;600;700&display=swap"
         }
-        document::Stylesheet { href: "/assets/styles/index.css" }
-        document::Stylesheet { href: "/assets/styles/App.css" }
-        document::Stylesheet { href: "/assets/styles/transitions.css" }
-        document::Stylesheet { href: "/assets/styles/components/Home/Home.css" }
-        document::Stylesheet { href: "/assets/styles/components/StartingScreen/StartingScreen.css" }
-        document::Stylesheet { href: "/assets/styles/components/Close/Close.css" }
-        document::Stylesheet { href: "/assets/styles/components/Manifesto/Manifesto.css" }
-        document::Stylesheet { href: "/assets/styles/components/NotFound/NotFound.css" }
-        document::Stylesheet { href: "/assets/styles/components/Credentials/Credentials.css" }
-        document::Stylesheet { href: "/assets/styles/components/Writing/Writing.css" }
-        document::Stylesheet { href: "/assets/styles/components/AIArchitecture/AIArchitecture.css" }
-        document::Stylesheet { href: "/assets/styles/components/ContactMe/ContactMe.css" }
+        document::Stylesheet { href: "/static/styles/index.css" }
+        document::Stylesheet { href: "/static/styles/App.css" }
+        document::Stylesheet { href: "/static/styles/transitions.css" }
+        document::Stylesheet { href: "/static/styles/components/Home/Home.css" }
+        document::Stylesheet { href: "/static/styles/components/StartingScreen/StartingScreen.css" }
+        document::Stylesheet { href: "/static/styles/components/Close/Close.css" }
+        document::Stylesheet { href: "/static/styles/components/Manifesto/Manifesto.css" }
+        document::Stylesheet { href: "/static/styles/components/NotFound/NotFound.css" }
+        document::Stylesheet { href: "/static/styles/components/Credentials/Credentials.css" }
+        document::Stylesheet { href: "/static/styles/components/Writing/Writing.css" }
+        document::Stylesheet { href: "/static/styles/components/AIArchitecture/AIArchitecture.css" }
+        document::Stylesheet { href: "/static/styles/components/ContactMe/ContactMe.css" }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/ProfessionalExperience.css"
+            href: "/static/styles/components/ProfessionalExperience/ProfessionalExperience.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/SingleExperience/SingleExperience.css"
+            href: "/static/styles/components/SingleExperience/SingleExperience.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/AgentWorkflowDiagram/AgentWorkflowDiagram.css"
+            href: "/static/styles/components/ProfessionalExperience/AgentWorkflowDiagram/AgentWorkflowDiagram.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/CICDPipelineDiagram/CICDPipelineDiagram.css"
+            href: "/static/styles/components/ProfessionalExperience/CICDPipelineDiagram/CICDPipelineDiagram.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/LayeredArchitectureDiagram/LayeredArchitectureDiagram.css"
+            href: "/static/styles/components/ProfessionalExperience/LayeredArchitectureDiagram/LayeredArchitectureDiagram.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/RealTimeSyncDiagram/RealTimeSyncDiagram.css"
+            href: "/static/styles/components/ProfessionalExperience/RealTimeSyncDiagram/RealTimeSyncDiagram.css"
         }
         document::Stylesheet {
-            href: "/assets/styles/components/ProfessionalExperience/InfrastructureDiagram/InfrastructureDiagram.css"
+            href: "/static/styles/components/ProfessionalExperience/InfrastructureDiagram/InfrastructureDiagram.css"
         }
 
         // Background canvas — Bevy mounts here per PORT-BEVY-1.

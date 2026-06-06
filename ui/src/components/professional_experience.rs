@@ -149,14 +149,14 @@ pub fn ProfessionalExperience() -> Element {
                                         current: current,
                                         on_select: move |key| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                             current.set(Some(key));
                                             measure_bar(key);
                                         },
                                         on_hover: move |key| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                             hovered.set(Some(key));
                                             measure_bar(key);
@@ -169,7 +169,7 @@ pub fn ProfessionalExperience() -> Element {
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
                                             span { class: "entity-name",
-                                                img { src: "/assets/images/finance.svg", alt: "", class: "header-icon-svg" }
+                                                img { src: "/static/images/finance.svg", alt: "", class: "header-icon-svg" }
                                                 " S&P Global Market Intelligence"
                                             }
                                             span { class: "dots" }
@@ -187,14 +187,14 @@ pub fn ProfessionalExperience() -> Element {
                                             current: current,
                                             on_select: move |k| {
                                                 if !*audio.is_muted.read() {
-                                                    play_sound("/assets/sounds/select.mp3", 0.45);
+                                                    play_sound("/static/sounds/select.mp3", 0.45);
                                                 }
                                                 current.set(Some(k));
                                                 measure_bar(k);
                                             },
                                             on_hover: move |k| {
                                                 if !*audio.is_muted.read() {
-                                                    play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                    play_sound("/static/sounds/woosh3.mp3", 0.25);
                                                 }
                                                 hovered.set(Some(k));
                                                 measure_bar(k);
@@ -211,7 +211,7 @@ pub fn ProfessionalExperience() -> Element {
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
                                             span { class: "entity-name",
-                                                img { src: "/assets/images/city.svg", alt: "", class: "header-icon-svg" }
+                                                img { src: "/static/images/city.svg", alt: "", class: "header-icon-svg" }
                                                 " The New Agora (Independent Project)"
                                             }
                                             span { class: "dots" }
@@ -236,14 +236,14 @@ pub fn ProfessionalExperience() -> Element {
                                             current: current,
                                             on_select: move |k| {
                                                 if !*audio.is_muted.read() {
-                                                    play_sound("/assets/sounds/select.mp3", 0.45);
+                                                    play_sound("/static/sounds/select.mp3", 0.45);
                                                 }
                                                 current.set(Some(k));
                                                 measure_bar(k);
                                             },
                                             on_hover: move |k| {
                                                 if !*audio.is_muted.read() {
-                                                    play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                    play_sound("/static/sounds/woosh3.mp3", 0.25);
                                                 }
                                                 hovered.set(Some(k));
                                                 measure_bar(k);
@@ -266,14 +266,14 @@ pub fn ProfessionalExperience() -> Element {
                                         current: current,
                                         on_select: move |k| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                             current.set(Some(k));
                                             measure_bar(k);
                                         },
                                         on_hover: move |k| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                             hovered.set(Some(k));
                                             measure_bar(k);
@@ -295,14 +295,14 @@ pub fn ProfessionalExperience() -> Element {
                                         current: current,
                                         on_select: move |k| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                             current.set(Some(k));
                                             measure_bar(k);
                                         },
                                         on_hover: move |k| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                             hovered.set(Some(k));
                                             measure_bar(k);
@@ -324,7 +324,7 @@ pub fn ProfessionalExperience() -> Element {
                                     CredentialsPreview {
                                         on_back: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh2.mp3", 0.1);
+                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
                                             }
                                             current.set(None);
                                             bar_visible.set(false);
@@ -335,19 +335,19 @@ pub fn ProfessionalExperience() -> Element {
                                     ChoralePreview {
                                         on_back: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh2.mp3", 0.1);
+                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
                                             }
                                             current.set(None);
                                             bar_visible.set(false);
                                         },
                                         on_link_hover: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                         },
                                         on_link_click: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                         },
                                     }
@@ -356,19 +356,19 @@ pub fn ProfessionalExperience() -> Element {
                                     CamerataPreview {
                                         on_back: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh2.mp3", 0.1);
+                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
                                             }
                                             current.set(None);
                                             bar_visible.set(false);
                                         },
                                         on_link_hover: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/woosh3.mp3", 0.25);
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
                                             }
                                         },
                                         on_link_click: move |_| {
                                             if !*audio.is_muted.read() {
-                                                play_sound("/assets/sounds/select.mp3", 0.45);
+                                                play_sound("/static/sounds/select.mp3", 0.45);
                                             }
                                         },
                                     }
@@ -490,7 +490,7 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 span { class: "custom-preview-date", "Published to crates.io" }
             }
             img {
-                src: "/assets/images/chorale-qa-harness.png",
+                src: "/static/images/chorale-qa-harness.png",
                 alt: "Chorale QA harness showing a 10,010-row data table with sorting, filtering, virtualization, selection, column visibility, CSV export, and column resize enabled",
                 class: "custom-preview-image",
             }
@@ -500,7 +500,7 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 ", published to crates.io."
             }
             img {
-                src: "/assets/images/chorale-custom-cells.png",
+                src: "/static/images/chorale-custom-cells.png",
                 alt: "Chorale custom cell rendering example with Service, Status, and Health columns, showing badge variants and arbitrary Dioxus markup keyed by column id",
                 class: "custom-preview-image",
             }
@@ -555,7 +555,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
                 span { class: "custom-preview-date", "v0.1.0, May 2026" }
             }
             img {
-                src: "/assets/images/camerata-overview.png",
+                src: "/static/images/camerata-overview.png",
                 alt: "Camerata desktop GUI showing the principle selection view, with domains and rules listed for adoption",
                 class: "custom-preview-image",
             }
@@ -565,7 +565,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
                 ". It generates machine-enforceable AI-agent config (AGENTS.md, CONVENTIONS.md) from ~95 starter principles, each a TOML rule with explicit alternatives and a test for what qualifies."
             }
             img {
-                src: "/assets/images/camerata-principle.png",
+                src: "/static/images/camerata-principle.png",
                 alt: "Camerata desktop GUI showing a single principle's detail view with summary, why, and adoption options",
                 class: "custom-preview-image",
             }

@@ -27,7 +27,7 @@ pub fn StartingScreen() -> Element {
                     style: "cursor: pointer",
                     onclick: move |_| {
                         if !*audio.is_muted.read() {
-                            play_sound("/assets/sounds/select.mp3", 0.45);
+                            play_sound("/static/sounds/select.mp3", 0.45);
                         }
                         navigator.push("/");
                     },

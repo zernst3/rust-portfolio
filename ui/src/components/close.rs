@@ -28,7 +28,7 @@ pub fn Close() -> Element {
                 r#type: "button",
                 onclick: move |_| {
                     if !*audio.is_muted.read() {
-                        play_sound("/assets/sounds/woosh2.mp3", 0.1);
+                        play_sound("/static/sounds/woosh2.mp3", 0.1);
                     }
                     nav.push(Route::Home {});
                 },
