@@ -110,7 +110,7 @@ pub fn App() -> Element {
         // freely: last value is opacity (0.82 = mostly opaque).
         div {
             id: "background-overlay",
-            style: "position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(8,12,16,0.82);"
+            style: "position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(8,12,16,0.72);"
         }
 
         div { id: "App",
