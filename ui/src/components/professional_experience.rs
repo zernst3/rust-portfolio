@@ -32,6 +32,7 @@ const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("Column show / hide", "✓", "✓"),
     ("Column resize", "✓", "✓"),
     ("CSV export", "✓", "✓"),
+    ("Excel (XLSX) export", "—", "✓"),
     ("Column reorder", "—", "✓"),
     ("Frozen columns", "—", "✓"),
     ("In-cell editing", "—", "✓"),
