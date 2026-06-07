@@ -54,6 +54,10 @@
 #Home .menuContainer div li {
   box-sizing: border-box;
   padding: 0 20px;
+  /* Small breathing room between the leading icon and the label. The li is a
+     flex row (icon span + text span); gap spaces them without touching the
+     Links trigger, whose li wraps a single button child. */
+  gap: 10px;
   /* Compressed from 75px to fit the 5th menu item (AI Architecture) within
      the menu container without overflowing into the title above. */
   height: 60px;

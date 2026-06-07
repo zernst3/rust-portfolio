@@ -33,14 +33,12 @@ use crate::App;
 /// All `/assets/...` hrefs in lib.rs and component files have been updated to
 /// `/static/...` to match this new prefix.  dx's `/assets/...` references in its
 /// generated HTML are left untouched — those are served by `serve_static_assets()`.
-/// The API routes (contact + pageview). Generic over state so the exact same
-/// routes compose into the full app (`Router<FullstackState>`) and into the
-/// test router (`Router<()>`). The handlers are stateless, so they attach to any
+/// The API routes (contact). Generic over state so the exact same routes
+/// compose into the full app (`Router<FullstackState>`) and into the test
+/// router (`Router<()>`). The handlers are stateless, so they attach to any
 /// state type.
 fn api_routes<S: Clone + Send + Sync + 'static>() -> Router<S> {
-    Router::new()
-        .route("/api/contact", post(crate::handlers::contact::contact))
-        .route("/api/pageview", post(crate::handlers::pageview::pageview))
+    Router::new().route("/api/contact", post(crate::handlers::contact::contact))
 }
 
 /// Test-only router: just the API routes, with NO static-asset serving or SSR.

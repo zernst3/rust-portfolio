@@ -33,10 +33,6 @@ path = "src/main.rs"
 name = "contact"
 path = "tests/contact.rs"
 
-[[test]]
-name = "pageview"
-path = "tests/pageview.rs"
-
 [dependencies]
 # Always compiled (both native and wasm32)
 dioxus = { workspace = true }
