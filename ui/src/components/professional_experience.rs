@@ -19,6 +19,39 @@ const AGORA_ITEMS: &[&str] = &[
     "infrastructureAndSecurity",
 ];
 
+// Chorale v0.1.0 → v0.2.0 capability comparison, sourced from the chorale
+// CHANGELOG (v0.2.0, 2026-06-05). "✓" = included, "—" = not in that version,
+// text = a qualified capability that grew between versions.
+const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
+    ("Headless core + Dioxus", "✓", "✓"),
+    ("Row virtualization", "Fixed height", "Fixed + variable"),
+    ("Sorting", "Single column", "Multi-column"),
+    ("Column filtering", "✓", "✓"),
+    ("Pagination", "Pages", "Pages + infinite scroll"),
+    ("Row selection", "✓", "✓"),
+    ("Column show / hide", "✓", "✓"),
+    ("Column resize", "✓", "✓"),
+    ("CSV export", "✓", "✓"),
+    ("Column reorder", "—", "✓"),
+    ("Frozen columns", "—", "✓"),
+    ("In-cell editing", "—", "✓"),
+    ("Grouping + aggregation", "—", "✓"),
+    ("Master / detail rows", "—", "✓"),
+    ("i18n / custom labels", "—", "✓"),
+    ("Leptos bindings", "—", "✓"),
+    ("Derive macro (TableRow)", "—", "✓"),
+];
+
+/// Cell class for a feature-table value: accent for included, muted for absent,
+/// neutral for a qualified text value.
+fn feature_cell_class(value: &str) -> &'static str {
+    match value {
+        "✓" => "ft-yes",
+        "—" => "ft-no",
+        _ => "ft-val",
+    }
+}
+
 fn item_label(key: &str) -> &'static str {
     match key {
         "credentials" => "Education & Certifications",
@@ -495,7 +528,25 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
             div { class: "custom-preview-meta",
                 span { class: "custom-preview-tag", "Open Source" }
                 span { class: "custom-preview-dot", "·" }
-                span { class: "custom-preview-date", "Published to crates.io" }
+                span { class: "custom-preview-date", "v0.2.0 in testing" }
+            }
+            // v0.2.0 status snippet + live example.
+            div { class: "chorale-status",
+                p {
+                    strong { class: "green-text", "v0.2.0 is feature-complete and currently in testing" }
+                    ", now with "
+                    strong { class: "green-text", "349 passing unit tests" }
+                    "."
+                }
+                a {
+                    class: "custom-preview-cta",
+                    href: "https://zernst3.github.io/rust-chorale/",
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    onmouseenter: move |_| props.on_link_hover.call(()),
+                    onclick: move |_| props.on_link_click.call(()),
+                    "Try the live example ↗"
+                }
             }
             img {
                 src: "/static/images/chorale-qa-harness.png",
@@ -515,9 +566,27 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
             p {
                 "I orchestrated it with AI end to end in an unfamiliar language, held to a production bar: "
                 strong { class: "green-text", "clippy-pedantic-clean" }
-                ", fully tested (including "
-                strong { class: "green-text", "137 passing unit tests" }
-                "), unsafe forbidden. Built to demonstrate that AI orchestration can hold a real quality standard, not just move fast."
+                ", fully tested, unsafe forbidden. Built to demonstrate that AI orchestration can hold a real quality standard, not just move fast."
+            }
+            // v0.1.0 vs v0.2.0 capability comparison.
+            h3 { class: "custom-preview-h3", "v0.1.0 vs v0.2.0" }
+            table { class: "feature-table",
+                thead {
+                    tr {
+                        th { "Capability" }
+                        th { "v0.1.0" }
+                        th { "v0.2.0" }
+                    }
+                }
+                tbody {
+                    {CHORALE_FEATURES.iter().map(|(feature, v01, v02)| rsx! {
+                        tr { key: "{feature}",
+                            td { class: "ft-feature", "{feature}" }
+                            td { class: feature_cell_class(v01), "{v01}" }
+                            td { class: feature_cell_class(v02), "{v02}" }
+                        }
+                    })}
+                }
             }
             a {
                 class: "custom-preview-cta",

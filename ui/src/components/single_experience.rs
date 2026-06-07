@@ -144,7 +144,7 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             p {
                 "Built a Python "
                 strong { class: "green-text", "FastAPI" }
-                " service and its Dockerfile to replace a set of "
+                " service and its Dockerfile to replace a set of 14 "
                 strong { class: "green-text", "Azure Functions" }
                 ", now being deployed to "
                 strong { class: "green-text", "AWS ECS" }
