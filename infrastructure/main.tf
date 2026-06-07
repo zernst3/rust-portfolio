@@ -44,14 +44,9 @@ resource "azurerm_log_analytics_workspace" "main" {
   tags                = local.tags
 }
 
-resource "azurerm_container_registry" "main" {
-  name                = "acr${local.base_nodash}${random_string.suffix.result}"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  sku                 = "Basic"
-  admin_enabled       = false # pull via managed identity, not admin creds
-  tags                = local.tags
-}
+# Image registry is GitHub Container Registry (ghcr.io), a PUBLIC package — free,
+# and public images need no Azure-side credentials. (Replaced the Basic ACR,
+# which cost ~$5/mo.) The image is built + pushed by the GitHub Actions deploy.
 
 # ── Identity + role grants (created before the Container App) ─────────────────
 resource "azurerm_user_assigned_identity" "app" {
@@ -59,12 +54,6 @@ resource "azurerm_user_assigned_identity" "app" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   tags                = local.tags
-}
-
-resource "azurerm_role_assignment" "acr_pull" {
-  scope                = azurerm_container_registry.main.id
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_user_assigned_identity.app.principal_id
 }
 
 resource "azurerm_role_assignment" "kv_secrets_user" {
@@ -121,11 +110,8 @@ resource "azurerm_container_app" "main" {
     identity_ids = [azurerm_user_assigned_identity.app.id]
   }
 
-  # Pull from ACR using the managed identity (no admin password).
-  registry {
-    server   = azurerm_container_registry.main.login_server
-    identity = azurerm_user_assigned_identity.app.id
-  }
+  # Image is pulled from a PUBLIC ghcr.io package — public images need no
+  # registry credentials, so there is no registry{} block.
 
   # Mailgun API key sourced from Key Vault via the managed identity (never raw).
   secret {
@@ -145,7 +131,7 @@ resource "azurerm_container_app" "main" {
   }
 
   template {
-    min_replicas = 0 # scale to zero when idle (cold start on first request)
+    min_replicas = 1 # keep one replica always warm — no cold start for recruiters
     max_replicas = 1
 
     container {
@@ -177,7 +163,6 @@ resource "azurerm_container_app" "main" {
   }
 
   depends_on = [
-    azurerm_role_assignment.acr_pull,
     azurerm_role_assignment.kv_secrets_user,
   ]
 }

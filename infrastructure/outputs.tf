@@ -3,16 +3,6 @@ output "resource_group_name" {
   value       = azurerm_resource_group.main.name
 }
 
-output "acr_name" {
-  description = "Container registry name — set as the ACR_NAME GitHub variable."
-  value       = azurerm_container_registry.main.name
-}
-
-output "acr_login_server" {
-  description = "ACR login server (e.g. acr....azurecr.io)."
-  value       = azurerm_container_registry.main.login_server
-}
-
 output "container_app_name" {
   description = "Container App name — set as the CONTAINER_APP_NAME GitHub variable."
   value       = azurerm_container_app.main.name

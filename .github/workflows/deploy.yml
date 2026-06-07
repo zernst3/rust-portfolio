@@ -1,7 +1,8 @@
 name: Deploy
 
-# Build the image in ACR and roll it out to the Container App on every push to
-# main (and on demand). Auth is passwordless via OIDC federated credentials.
+# Build the image, push it to GitHub Container Registry (ghcr.io), and roll it
+# out to the Container App on every push to main (and on demand). Azure auth is
+# passwordless via OIDC; GHCR auth uses the built-in GITHUB_TOKEN.
 on:
   push:
     branches: [main]
@@ -10,13 +11,15 @@ on:
 permissions:
   id-token: write # required for azure/login OIDC
   contents: read
+  packages: write # required to push to ghcr.io
 
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  IMAGE_REPO: portfolio
+  # ghcr.io/<owner>/<repo>/portfolio (owner/repo are already lowercase)
+  IMAGE: ghcr.io/${{ github.repository }}/portfolio
 
 jobs:
   deploy:
@@ -24,22 +27,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Surface the repo Variables (these are NOT secrets) and fail fast with a
-      # clear message if ACR_NAME is missing — the #1 deploy misconfiguration is
-      # setting it as a Secret (invisible to `vars.`) or with the .azurecr.io
-      # suffix. Brackets make an empty value obvious.
-      - name: Validate config
-        run: |
-          echo "ACR_NAME=[${{ vars.ACR_NAME }}]"
-          echo "RESOURCE_GROUP=[${{ vars.RESOURCE_GROUP }}]"
-          echo "CONTAINER_APP_NAME=[${{ vars.CONTAINER_APP_NAME }}]"
-          if [ -z "${{ vars.ACR_NAME }}" ]; then
-            echo "::error::ACR_NAME repo Variable is empty. Set it under Settings > Secrets and variables > Actions > the VARIABLES tab (not Secrets), as the bare registry name (no .azurecr.io)."
-            exit 1
-          fi
-          case "${{ vars.ACR_NAME }}" in
-            *.*) echo "::error::ACR_NAME contains a dot — use the bare registry name (e.g. acrrustportfolio79gvbl), not the .azurecr.io login server."; exit 1 ;;
-          esac
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Builds the Dockerfile on the runner and pushes to GHCR. Tagged with the
+      # commit SHA (immutable) and latest.
+      - name: Build and push image to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
 
       - name: Azure login (OIDC)
         uses: azure/login@v2
@@ -48,19 +52,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Builds the Dockerfile server-side in ACR (no Docker needed on the
-      # runner). Tags with the commit SHA (immutable) and latest.
-      - name: Build image in ACR
-        run: |
-          az acr build \
-            --registry "${{ vars.ACR_NAME }}" \
-            --image "${IMAGE_REPO}:${{ github.sha }}" \
-            --image "${IMAGE_REPO}:latest" \
-            .
-
       - name: Roll out to Container App
         run: |
           az containerapp update \
             --name "${{ vars.CONTAINER_APP_NAME }}" \
             --resource-group "${{ vars.RESOURCE_GROUP }}" \
-            --image "${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_REPO}:${{ github.sha }}"
+            --image "${{ env.IMAGE }}:${{ github.sha }}"
