@@ -66,6 +66,7 @@ static HEADER_STRINGS: &[&str] = &[
     "Aligning distributed contributors to one architecture across time zones",
     "Building robust digital infrastructure for the systems that shape our environment",
     "Ensuring resilient, secure and scalable ground-up systems",
+    "Building in Rust through AI orchestration, this site included"
 ];
 
 // ── Inline SVG icons (Material Design, 24×24 viewBox) ─────────────────────
