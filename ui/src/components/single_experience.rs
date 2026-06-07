@@ -182,9 +182,59 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
         },
         "aiNativeWorkflow" => rsx! {
             p {
-                "Run the codebase through scheduled agents for code review, bug triage, and dependency-vulnerability sweeps. The architecture's rules live in "
-                strong { class: "green-text", "lint and CI" }
-                ": layer boundaries, migration-safety checks, secret scanning, and audit-field gates."
+                "Agora runs on an AI-orchestrated workflow. Eight scheduled routines do the recurring work, each a single tightly scoped unattended job:"
+            }
+            ul { class: "routine-list",
+                li {
+                    strong { class: "green-text", "Daily review brief" }
+                    ": scans the day's commits for architectural violations."
+                }
+                li {
+                    strong { class: "green-text", "Bug triage" }
+                    ": reproduces open issues and opens fix PRs, capped at two a day to respect review bandwidth."
+                }
+                li {
+                    strong { class: "green-text", "Daily wrap-up" }
+                    ": digests the day's automated and human activity for collaborators across time zones."
+                }
+                li {
+                    strong { class: "green-text", "Morning consolidator" }
+                    ": ranks every routine's overnight output into one prioritized digest."
+                }
+                li {
+                    strong { class: "green-text", "Weekly drift watcher" }
+                    ": tracks where the live TypeScript has drifted from the in-progress Rust port."
+                }
+                li {
+                    strong { class: "green-text", "Weekly product digest" }
+                    ": what shipped, what opened and closed, and what is still outstanding."
+                }
+                li {
+                    strong { class: "green-text", "Weekly dependency sweep" }
+                    ": attempts each high or critical bump, runs the full build and tests, opens a PR only if green."
+                }
+                li {
+                    strong { class: "green-text", "Overnight Rust port" }
+                    ": migrates the TypeScript codebase to Rust under documented conventions."
+                }
+            }
+            hr {}
+            p {
+                "Agora's rules are mechanical, not aspirational. An "
+                strong { class: "green-text", "ESLint rule" }
+                " blocks database calls outside the repository layer; organization permissions are gated by server-stamped "
+                strong { class: "green-text", "_can flags" }
+                " the front end is lint-banned from deriving itself; "
+                strong { class: "green-text", "gitleaks" }
+                " scans every PR for secrets; a migration linter catches dangerous DDL; and a "
+                strong { class: "green-text", "1,000+ test Jest suite" }
+                " gates every merge, human or agent."
+            }
+            hr {}
+            p {
+                "The largest routine is an overnight migration of the TypeScript backend to "
+                strong { class: "green-text", "Rust" }
+                ", running under documented convention rules with escalation for novel architectural calls. The SeaORM entity layer, the entity-to-domain mappers, and the repositories are done; it is now working through the application-service layer, with the workers, HTTP server, and UI to follow."
             }
             hr {}
             p {
@@ -195,9 +245,9 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
                 a {
                     href: "/ai-architecture",
                     class: "green-text",
-                    "See the full AI Architecture →"
+                    "See AI Architecture →"
                 }
-                " for the complete breakdown: tools, wrappers, routines, governance, enforcement and delivery."
+                " for the general approach behind this: the orchestration, routines, rules, governance, and front-loaded decisions I apply on every project."
             }
         },
         "infrastructureAndSecurity" => rsx! {

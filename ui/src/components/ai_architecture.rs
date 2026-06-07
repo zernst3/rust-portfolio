@@ -69,11 +69,11 @@ static TILES: &[Tile] = &[
             },
             Detail {
                 heading: "Fail-safe gap detection",
-                body: DetailBody::Text("The morning consolidator wrapper checks when the previous successful run completed. If more than 25 hours have passed, it sends a direct alert that the routine has been silently failing."),
+                body: DetailBody::Text("A wrapper records when each routine last succeeded. If too long passes without a successful run, it sends a direct alert, so a routine that has been silently failing surfaces instead of going unnoticed."),
             },
             Detail {
                 heading: "Exit-code accountability",
-                body: DetailBody::Text("The wrapper inspects the output and Slack-delivery result, not just the process exit code, so a routine that 'completed' but failed to deliver is detected and surfaced."),
+                body: DetailBody::Text("The wrapper inspects the actual output and the delivery result, not just the process exit code, so a routine that 'completed' but failed to deliver its result is still caught."),
             },
         ],
     },
@@ -81,39 +81,23 @@ static TILES: &[Tile] = &[
         id: 2,
         title: "Routines",
         icon: ICON_SCHEDULE,
-        summary: "Eight scheduled jobs do the routine work.",
+        summary: "Scheduled jobs handle the repetitive work.",
         details: &[
             Detail {
-                heading: "Daily review brief",
-                body: DetailBody::Text("Scans the day's commits for architectural violations and posts a concise report."),
+                heading: "One routine, one job",
+                body: DetailBody::Text("Each routine is a single, tightly scoped prompt aimed at one kind of work, not a general-purpose agent told to be helpful. Narrow scope is what makes an unattended overnight run safe to trust."),
             },
             Detail {
-                heading: "Bug triage (≤ 2 PRs/day)",
-                body: DetailBody::Text("Reads open issues, reproduces the bug, opens a fix PR. Capped at two PRs per day to respect human-review bandwidth."),
+                heading: "Work that maps onto a schedule",
+                body: DetailBody::Text("A lot of recurring engineering work fits this shape cleanly: review passes over recent commits, bug triage that opens fix PRs, dependency-security sweeps, status digests for collaborators in other time zones, and long-running migrations that grind through a large codebase over many nights."),
             },
             Detail {
-                heading: "Daily wrap-up summary",
-                body: DetailBody::Text("Recaps the day's automated and human activity into a single digest for collaborators in other time zones."),
+                heading: "Cadence by purpose",
+                body: DetailBody::Text("Fast-signal jobs run daily; heavier analysis runs weekly. The schedule matches how often each kind of work actually produces something worth a person's attention, which keeps the noise low."),
             },
             Detail {
-                heading: "Morning consolidator",
-                body: DetailBody::Text("Reads each overnight routine's inbox entries and writes one ranked digest as the day's first message: priority items first, then everything else. Replaces per-routine direct messaging (which the original architecture used and which produced too much noise) and ships with a 25-hour gap fail-safe that alerts if any expected consolidator run has been silently missed."),
-            },
-            Detail {
-                heading: "Weekly architectural drift watcher",
-                body: DetailBody::Text("Tracks where the live TypeScript codebase has drifted from the in-progress Rust port and logs the gap."),
-            },
-            Detail {
-                heading: "Weekly product digest",
-                body: DetailBody::Text("Summarizes what shipped, what opened and closed and which decisions are still outstanding."),
-            },
-            Detail {
-                heading: "Weekly dependency security sweep",
-                body: DetailBody::Text("Reads npm audit, attempts each high/critical bump, runs the full build and Jest suite, opens a PR only if green."),
-            },
-            Detail {
-                heading: "Overnight Rust port",
-                body: DetailBody::Text("Migrates the full TypeScript codebase to Rust under documented convention rules with auto-call escalation for novel architectural questions. The SeaORM entity layer, the entity-to-domain mappers, and the infrastructure repositories are populated; the routine is currently moving from infrastructure into the application-service layer, followed by workers, the HTTP server, and the UI. The goal is a complete language migration, not a partial coexistence."),
+                heading: "Capped to human bandwidth",
+                body: DetailBody::Text("Any routine that opens pull requests is rate-limited, so the machine never generates more review work in a day than a person can actually absorb."),
             },
         ],
     },
@@ -153,23 +137,19 @@ static TILES: &[Tile] = &[
         details: &[
             Detail {
                 heading: "Lint-encoded layer boundaries",
-                body: DetailBody::Text("An ESLint rule blocks any database call (db.insert/update/delete/select) outside the repository layer. A controller that reaches for the ORM directly fails CI and can't merge."),
-            },
-            Detail {
-                heading: "Per-resource permission flags",
-                body: DetailBody::Text("For organization-scoped permissions specifically (who can manage which org), the front end is lint-banned from introspecting permission arrays. Each org response carries a server-stamped _can flag the UI simply reads. Global permissions still use the standard permission-array check; the rule narrows the dangerous client-side derivation pattern without touching the simple cases."),
+                body: DetailBody::Text("Architectural boundaries are encoded as lint rules rather than left to convention. When a layer reaches past where it belongs, for example a controller touching the database directly, CI fails and the change cannot merge."),
             },
             Detail {
                 heading: "Secret scanning",
-                body: DetailBody::Text("gitleaks scans every PR for committed credentials. Failure blocks the merge."),
+                body: DetailBody::Text("Every pull request is scanned for committed credentials. A leaked secret blocks the merge before it can reach history."),
             },
             Detail {
                 heading: "Migration safety + audit fields",
-                body: DetailBody::Text("Migration linter catches dangerous DDL patterns; an audit-field rule enforces standard timestamping and modifier tracking on the tables that need them."),
+                body: DetailBody::Text("A migration linter catches dangerous schema-change patterns, and an audit-field rule enforces consistent timestamping and modifier tracking on the tables that need it."),
             },
             Detail {
-                heading: "1,000+ test merge gate",
-                body: DetailBody::Text("Every merge — human or agent — passes the full Jest suite. The test gate is the same regardless of authorship."),
+                heading: "The test suite gates every merge",
+                body: DetailBody::Text("The full test suite runs on every merge, human or agent, with no exception for authorship. Machine-written code clears exactly the same bar as code I write by hand."),
             },
         ],
     },
@@ -180,20 +160,20 @@ static TILES: &[Tile] = &[
         summary: "Outputs reach me through controlled channels.",
         details: &[
             Detail {
-                heading: "Composed digests → outbox",
-                body: DetailBody::Text("The morning consolidator writes its composed Slack message to a known outbox path. The wrapper reads the file and posts it via direct Slack API call."),
+                heading: "Compose, then deliver",
+                body: DetailBody::Text("A routine writes its finished message to a known outbox path; a wrapper reads that file and sends it. Composing and delivering are separate steps, so a formatting bug can never silently swallow the result."),
             },
             Detail {
-                heading: "Direct curl over MCP",
-                body: DetailBody::Text("Slack delivery uses a bot token and a curl POST instead of the Slack MCP server. This eliminates an entire class of 'silently broken delivery' failures that the prior architecture was vulnerable to."),
+                heading: "Delivery over a controlled channel",
+                body: DetailBody::Text("Messages go out through a direct, dependency-light API call rather than a heavier integration layer. That removes an entire class of failures where the work ran but the message never arrived."),
             },
             Detail {
-                heading: "Single morning DM",
-                body: DetailBody::Text("Individual routines write to an inbox during the night. One consolidator DM in the morning ranks the contents by priority and delivers the digest."),
+                heading: "One digest, not a stream",
+                body: DetailBody::Text("Individual routines write to an inbox through the night; one ranked digest arrives in the morning, priority first. One message to read instead of a trickle of notifications."),
             },
             Detail {
                 heading: "Tiered merge",
-                body: DetailBody::Text("Every machine-authored change lands as a pull request. Tight low-level PRs auto-merge once CI passes and CodeRabbit's AI review comes back clean. PRs that touch architectural surfaces or hard-guarded areas are flagged for human review before merging. The bot picks the channel based on PR scope so my time goes to the changes that actually need a person."),
+                body: DetailBody::Text("Every machine-authored change lands as a pull request. Tight, low-level PRs auto-merge once CI and automated review pass; PRs that touch architectural or sensitive surfaces are held for a person. The routine picks the channel by scope, so my time goes to the changes that actually need it."),
             },
         ],
     },
@@ -227,7 +207,7 @@ pub fn AIArchitecture() -> Element {
                     p {
                         class: "intro",
                         style: "animation: fade-in-kf 0.6s ease-out 0.2s forwards; opacity: 0",
-                        "The system I operate to make AI-written code trustworthy. Standards are encoded as enforceable rules; agents apply those rules on a schedule; I am the escalation path for the cases the rules don't cover. Click any tile to see the mechanism in detail."
+                        "How I build software by orchestrating AI instead of hand-writing it. The approach is the same on every project: settle the architecture up front and write it down as enforceable rules, let agents apply those rules on a schedule, and stay the escalation path for the cases the rules do not cover. The decisions that are expensive to reverse get made before any code is written, not discovered halfway through. Click any tile to see the mechanism."
                     }
 
                     div { class: "ai-arch-stage",

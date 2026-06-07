@@ -109,6 +109,26 @@
   line-height: 1.5;
 }
 
+/* Compact routine list (Agora AI-Native Workflow): smaller than body
+   paragraphs so eight items stay scannable in the preview pane. */
+.experienceInfo .routine-list {
+  margin: 8px 0 14px 0;
+  padding-left: 1.3em;
+  list-style: disc;
+}
+
+.experienceInfo .routine-list li {
+  font-size: 1.1em;
+  color: rgb(240, 240, 240);
+  font-weight: 300;
+  line-height: 1.45;
+  margin: 0 0 6px 0;
+}
+
+.experienceInfo .routine-list li strong {
+  font-weight: 500;
+}
+
 #SingleExperienceContainer .links {
   margin: 10px;
   display: flex;
