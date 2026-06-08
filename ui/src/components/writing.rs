@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 
+use crate::audio::play_sound;
 use crate::components::Close;
+use crate::contexts::audio::use_audio_state;
 
 struct Article {
     title: &'static str,
@@ -29,6 +31,8 @@ static ARTICLES: &[Article] = &[
 
 #[component]
 pub fn Writing() -> Element {
+    let audio = use_audio_state();
+
     rsx! {
         div { class: "page-enter",
             div { id: "WritingContainer", class: "subpage-overlay",
@@ -46,6 +50,16 @@ pub fn Writing() -> Element {
                                 href: "{article.url}",
                                 target: "_blank",
                                 rel: "noopener noreferrer",
+                                onmouseenter: move |_| {
+                                    if !*audio.is_muted.read() {
+                                        play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                    }
+                                },
+                                onclick: move |_| {
+                                    if !*audio.is_muted.read() {
+                                        play_sound("/static/sounds/select.mp3", 0.45);
+                                    }
+                                },
                                 div { class: "writing-card-meta",
                                     span { class: "writing-card-publication", "{article.publication}" }
                                     span { class: "writing-card-dot", "·" }

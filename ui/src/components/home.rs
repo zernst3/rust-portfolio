@@ -355,6 +355,16 @@ pub fn Home() -> Element {
                                                     href: link_item.href,
                                                     target: "_blank",
                                                     rel: "noopener noreferrer",
+                                                    onmouseenter: move |_| {
+                                                        if !*is_muted.peek() {
+                                                            play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                                        }
+                                                    },
+                                                    onclick: move |_| {
+                                                        if !*is_muted.peek() {
+                                                            play_sound("/static/sounds/select.mp3", 0.45);
+                                                        }
+                                                    },
                                                     div {
                                                         style: "display:flex;align-items:center;\
                                                                 gap:14px;padding:8px 16px;",

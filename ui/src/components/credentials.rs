@@ -1,9 +1,13 @@
 use dioxus::prelude::*;
 
+use crate::audio::play_sound;
 use crate::components::Close;
+use crate::contexts::audio::use_audio_state;
 
 #[component]
 pub fn Credentials() -> Element {
+    let audio = use_audio_state();
+
     rsx! {
         div { class: "page-enter",
             div { id: "EducationAndWorkContainer",
@@ -37,6 +41,16 @@ pub fn Credentials() -> Element {
                                         href: "https://learn.microsoft.com/api/credentials/share/en-us/ZacharyErnst-2786/3164FF9B17DAE905?sharingId",
                                         target: "_blank",
                                         rel: "noopener noreferrer",
+                                        onmouseenter: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                            }
+                                        },
+                                        onclick: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/select.mp3", 0.45);
+                                            }
+                                        },
                                         "Azure Developer Associate (AZ-204)"
                                     }
                                     " - Dec 2024"
@@ -46,6 +60,16 @@ pub fn Credentials() -> Element {
                                         href: "https://www.credly.com/badges/16c63be7-621b-489f-a475-0a740c997b28?source=linked_in_profile",
                                         target: "_blank",
                                         rel: "noopener noreferrer",
+                                        onmouseenter: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                            }
+                                        },
+                                        onclick: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/select.mp3", 0.45);
+                                            }
+                                        },
                                         "Azure Fundamentals (AZ-900)"
                                     }
                                     " - June 2022"

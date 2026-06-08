@@ -41,7 +41,7 @@ use routes::Route;
 /// replaces framer-motion).
 #[component]
 pub fn App() -> Element {
-    provide_audio_context();
+    let audio = provide_audio_context();
     provide_mobile_menu_context();
 
     // Animated water cinemagraph background, authored in Rust (web-sys/WebGL).
@@ -52,6 +52,59 @@ pub fn App() -> Element {
     use_effect(|| {
         #[cfg(target_arch = "wasm32")]
         background::mount();
+    });
+
+    // Background ambient tracks. Both start from t=0 the instant the user
+    // unmutes; both stop and reset on mute. Water Waves loops continuously.
+    // Rhapsody In Blue plays through, waits 3s, then restarts. Audio elements
+    // and the rhapsody-restart timer are kept on `window` so re-runs of this
+    // effect reuse them instead of double-creating instances.
+    use_effect(move || {
+        let muted = *audio.is_muted.read();
+        let js = if muted {
+            "(function(){\
+              if(window.bgWaterAudio){\
+                window.bgWaterAudio.pause();\
+                window.bgWaterAudio.currentTime=0;\
+              }\
+              if(window.bgRhapsodyAudio){\
+                window.bgRhapsodyAudio.pause();\
+                window.bgRhapsodyAudio.currentTime=0;\
+              }\
+              if(window.bgRhapsodyTimer){\
+                clearTimeout(window.bgRhapsodyTimer);\
+                window.bgRhapsodyTimer=null;\
+              }\
+            })()"
+        } else {
+            "(function(){\
+              if(!window.bgWaterAudio){\
+                var w=new Audio('/static/sounds/Water%20Waves.mp3');\
+                w.loop=true;\
+                w.volume=0.35;\
+                window.bgWaterAudio=w;\
+              }\
+              window.bgWaterAudio.currentTime=0;\
+              window.bgWaterAudio.play().catch(function(){});\
+              if(!window.bgRhapsodyAudio){\
+                var r=new Audio('/static/sounds/Rhapsody%20In%20Blue.mp3');\
+                r.loop=false;\
+                r.volume=0.5;\
+                r.addEventListener('ended',function(){\
+                  window.bgRhapsodyTimer=setTimeout(function(){\
+                    if(window.bgRhapsodyAudio){\
+                      window.bgRhapsodyAudio.currentTime=0;\
+                      window.bgRhapsodyAudio.play().catch(function(){});\
+                    }\
+                  },3000);\
+                });\
+                window.bgRhapsodyAudio=r;\
+              }\
+              window.bgRhapsodyAudio.currentTime=0;\
+              window.bgRhapsodyAudio.play().catch(function(){});\
+            })()"
+        };
+        let _ = document::eval(js);
     });
 
     rsx! {

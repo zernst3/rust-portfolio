@@ -369,6 +369,16 @@ pub fn ProfessionalExperience() -> Element {
                                             current.set(None);
                                             bar_visible.set(false);
                                         },
+                                        on_link_hover: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                            }
+                                        },
+                                        on_link_click: move |_| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/select.mp3", 0.45);
+                                            }
+                                        },
                                     }
                                 },
                                 Some("chorale") => rsx! {
@@ -471,6 +481,8 @@ fn PickerItem(props: PickerItemProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct CredentialsPreviewProps {
     on_back: EventHandler<()>,
+    on_link_hover: EventHandler<()>,
+    on_link_click: EventHandler<()>,
 }
 
 #[component]
@@ -489,6 +501,8 @@ fn CredentialsPreview(props: CredentialsPreviewProps) -> Element {
                     href: "https://learn.microsoft.com/api/credentials/share/en-us/ZacharyErnst-2786/3164FF9B17DAE905?sharingId",
                     target: "_blank",
                     rel: "noopener noreferrer",
+                    onmouseenter: move |_| props.on_link_hover.call(()),
+                    onclick: move |_| props.on_link_click.call(()),
                     "Verify ↗"
                 }
             }
@@ -498,6 +512,8 @@ fn CredentialsPreview(props: CredentialsPreviewProps) -> Element {
                     href: "https://www.credly.com/badges/16c63be7-621b-489f-a475-0a740c997b28?source=linked_in_profile",
                     target: "_blank",
                     rel: "noopener noreferrer",
+                    onmouseenter: move |_| props.on_link_hover.call(()),
+                    onclick: move |_| props.on_link_click.call(()),
                     "Verify ↗"
                 }
             }
