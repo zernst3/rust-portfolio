@@ -763,6 +763,15 @@
     z-index: 1000000000;
     padding: 16px 14px;
     overflow-y: auto;
+    /* Hide the modal scrollbar chrome (content still scrolls), matching the
+       SingleExperience modals and the rest of the site. */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #ProfessionalExperienceContainer.experience-selected .custom-preview::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   /* Exit animation on mobile. The open detail is a full-screen,

@@ -199,6 +199,23 @@
     min-height: 75px;
 
   }
+
+  /* Hide the modal scroller's scrollbar chrome on mobile (content still
+     scrolls by drag/touch/wheel), matching the Work page and the other
+     content pages. #SingleExperienceContainer is the real scroller
+     (base overflow:auto + height:100dvh here); the outer container is
+     covered too as a harmless belt-and-suspenders in case it ever scrolls. */
+  #SingleExperienceOuterContainer,
+  #SingleExperienceContainer {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #SingleExperienceOuterContainer::-webkit-scrollbar,
+  #SingleExperienceContainer::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 }
 
 @media only screen and (max-height: 700px) {
