@@ -120,6 +120,20 @@
 }
 
 @media only screen and (max-width: 1050px) {
+  /* Hide the scroller's scrollbar chrome on mobile, matching the Work page
+     (content still scrolls by drag/touch/wheel). Real phones use zero-width
+     overlay scrollbars anyway; this makes classic-scrollbar setups and device
+     emulation consistent with that. */
+  #ManifestoInnerContainer {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #ManifestoInnerContainer::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
   #ManifestoInnerContainer h1 {
     font-size: 2.2rem;
     margin-bottom: 2rem;

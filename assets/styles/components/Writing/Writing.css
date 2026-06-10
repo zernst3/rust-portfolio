@@ -107,6 +107,23 @@
   letter-spacing: 0.02em;
 }
 
+/* Hide the scroller's scrollbar chrome on mobile/tablet, matching the Work
+   page (content still scrolls by drag/touch/wheel). Real phones use zero-width
+   overlay scrollbars anyway; this makes classic-scrollbar setups and device
+   emulation consistent with that. Uses the 1050px breakpoint shared across the
+   other pages' scrollbar-hide rules, not Writing's narrower 670px layout one. */
+@media (max-width: 1050px) {
+  #WritingInnerContainer {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #WritingInnerContainer::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
 @media (max-width: 670px) {
   #WritingInnerContainer {
     padding: 24px 16px;
