@@ -1,11 +1,23 @@
 use axum::{
+    response::IntoResponse,
     routing::{get, post},
     Router,
 };
 use dioxus::server::{render_handler, DioxusRouterExt, FullstackState, ServeConfig};
-use tower_http::services::ServeDir;
+use tower_http::{compression::CompressionLayer, services::ServeDir};
 
 use crate::App;
+
+/// `/robots.txt` served verbatim from the repo. The companion `ui/index.html`
+/// is picked up automatically by `dx bundle` (it scans the crate root for a
+/// custom `index.html`) and replaces dioxus-cli's default prod template,
+/// which is missing `<html lang>` and the meta description — Lighthouse
+/// flags both.
+const ROBOTS_TXT: &str = include_str!("../robots.txt");
+
+async fn robots_txt() -> impl IntoResponse {
+    ([(axum::http::header::CONTENT_TYPE, "text/plain; charset=utf-8")], ROBOTS_TXT)
+}
 
 /// Build the Axum router: SSR fallback + validated API handlers + static assets.
 ///
@@ -57,6 +69,8 @@ pub fn build_router() -> Router {
     // Explicit state type so DioxusRouterExt (impl'd on Router<FullstackState>) is reachable
     // before .with_state() consumes it.
     let router: Router<FullstackState> = api_routes::<FullstackState>()
+        // /robots.txt at the root for crawlers.
+        .route("/robots.txt", get(robots_txt))
         // Repo static files: CSS, images, sounds, the NYC photo.
         // Mounted at /static to leave /assets free for dx's serve_static_assets().
         .nest_service("/static", ServeDir::new("assets"))
@@ -66,5 +80,12 @@ pub fn build_router() -> Router {
         // Register dioxus server functions (e.g. RSX server actions).
         .register_server_functions();
 
-    router.fallback(get(render_handler)).with_state(state)
+    // gzip/brotli compression on the response. The defaults compress every
+    // text-like content-type (text/*, application/json, application/javascript,
+    // application/wasm, application/xml) and skip already-compressed binaries
+    // like mp3/png. Halves the wire size of our CSS + the WASM bundle.
+    router
+        .fallback(get(render_handler))
+        .layer(CompressionLayer::new())
+        .with_state(state)
 }

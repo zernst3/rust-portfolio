@@ -29,7 +29,7 @@ dioxus = { version = "0.7", features = ["fullstack", "router"] }
 axum = "0.8.9"
 tokio = { version = "1", features = ["full"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip"] }
+tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip", "compression-br"] }
 
 # Errors — thiserror per crate per RUST-DOMAIN-4. anyhow only at app entry.
 thiserror = "2"
