@@ -182,40 +182,28 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
         },
         "aiNativeWorkflow" => rsx! {
             p {
-                "Agora runs on an AI-orchestrated workflow. Eight scheduled routines do the recurring work, each a single tightly scoped unattended job:"
+                "Agora runs on an AI-orchestrated workflow. Five scheduled routines do the recurring work, each a single tightly scoped unattended job:"
             }
             ul { class: "routine-list",
-                li {
-                    strong { class: "green-text", "Daily review brief" }
-                    ": scans the day's commits for architectural violations."
-                }
-                li {
-                    strong { class: "green-text", "Bug triage" }
-                    ": reproduces open issues and opens fix PRs, capped at two a day to respect review bandwidth."
-                }
-                li {
-                    strong { class: "green-text", "Daily wrap-up" }
-                    ": digests the day's automated and human activity for collaborators across time zones."
-                }
                 li {
                     strong { class: "green-text", "Morning consolidator" }
                     ": ranks every routine's overnight output into one prioritized digest."
                 }
                 li {
-                    strong { class: "green-text", "Weekly drift watcher" }
-                    ": tracks where the live TypeScript has drifted from the in-progress Rust port."
+                    strong { class: "green-text", "Daily digest" }
+                    ": a single evening recap of what shipped, what opened, and what is waiting on review."
                 }
                 li {
-                    strong { class: "green-text", "Weekly product digest" }
-                    ": what shipped, what opened and closed, and what is still outstanding."
+                    strong { class: "green-text", "Bug triage" }
+                    ": reproduces an open issue and opens at most one fix PR per night, sized to my review bandwidth."
                 }
                 li {
-                    strong { class: "green-text", "Weekly dependency sweep" }
-                    ": attempts each high or critical bump, runs the full build and tests, opens a PR only if green."
+                    strong { class: "green-text", "Weekly omnibus" }
+                    ": one Sunday run that merges main into the Rust port branch, classifies the week's drift by phase, attempts security bumps, and surfaces decisions outstanding for the coming week."
                 }
                 li {
                     strong { class: "green-text", "Overnight Rust port" }
-                    ": migrates the TypeScript codebase to Rust under documented conventions."
+                    ": migrates the TypeScript codebase to Rust under documented conventions, including the UI primitives layer once the port reaches the UI phases."
                 }
             }
             hr {}
