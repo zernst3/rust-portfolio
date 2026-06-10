@@ -2,14 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!--
-      <title> is required here, even though document::Title in lib.rs
-      overrides it at render time. dioxus-server's IndexHtml parser
-      (index_html.rs:71-81) only populates head_before_title when it
-      finds a <title> tag in the source — without one, head_before_title
-      is empty, the DOCTYPE falls into head_after_title, and SSR emits
-      the dynamic title BEFORE the DOCTYPE, triggering quirks mode.
-    -->
     <title>Zachary Ernst</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Zachary Ernst — Technical Lead and AI-architecture practitioner. Portfolio of AI-orchestrated work, including the agora.new platform, the Camerata convention library, and the Chorale Rust table components." />

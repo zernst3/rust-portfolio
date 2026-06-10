@@ -183,6 +183,9 @@ static TILES: &[Tile] = &[
 pub fn AIArchitecture() -> Element {
     let audio = use_audio_state();
     let mut focused: Signal<Option<usize>> = use_signal(|| None);
+    // While true, the focused tile carries `.detail-leaving` so it plays the
+    // fade+slide-down exit before `focused` is cleared back to the grid.
+    let mut is_closing: Signal<bool> = use_signal(|| false);
 
     let is_focused = focused.read().is_some();
     let grid_style = if is_focused {
@@ -260,7 +263,7 @@ pub fn AIArchitecture() -> Element {
                         if let Some(idx) = *focused.read() {
                             if let Some(tile) = TILES.get(idx) {
                                 div {
-                                    class: "tile-focused",
+                                    class: if *is_closing.read() { "tile-focused detail-leaving" } else { "tile-focused" },
                                     style: "animation: tile-focused-enter-kf 0.3s cubic-bezier(0.4,0,0.2,1) forwards; opacity: 0",
                                     div { class: "tile-focused-header",
                                         div {
@@ -271,10 +274,21 @@ pub fn AIArchitecture() -> Element {
                                         button {
                                             class: "back-button",
                                             onclick: move |_| {
+                                                if *is_closing.peek() {
+                                                    return;
+                                                }
                                                 if !*audio.is_muted.read() {
                                                     play_sound("/static/sounds/woosh2.mp3", 0.1);
                                                 }
-                                                focused.set(None);
+                                                is_closing.set(true);
+                                                spawn(async move {
+                                                    // Match the `.detail-leaving` duration (0.2s) in transitions.css.
+                                                    document::eval("await new Promise(function(r){setTimeout(r,200);});")
+                                                        .await
+                                                        .ok();
+                                                    focused.set(None);
+                                                    is_closing.set(false);
+                                                });
                                             },
                                             "Back"
                                         }

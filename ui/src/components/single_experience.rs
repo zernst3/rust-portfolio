@@ -5,6 +5,7 @@ use crate::components::{
     AgentWorkflowDiagram, InfrastructureDiagram, LayeredArchitectureDiagram, RealTimeSyncDiagram,
 };
 use crate::contexts::audio::use_audio_state;
+use crate::contexts::page_transition::use_nav_with_transition;
 
 #[derive(Props, Clone, PartialEq)]
 pub struct SingleExperienceProps {
@@ -71,6 +72,8 @@ struct ExperienceDescriptionProps {
 
 #[component]
 fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
+    let audio = use_audio_state();
+    let transition = use_nav_with_transition();
     match props.experience_key {
         "scopeAndTrajectory" => rsx! {
             p {
@@ -230,9 +233,20 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             }
             AgentWorkflowDiagram {}
             p {
-                a {
-                    href: "/ai-architecture",
+                // Link via the page-transition hook so the AI Architecture page
+                // gets the standard fade+slide-up entrance instead of a hard
+                // full-page reload. onclick_only: true keeps Dioxus's Link from
+                // doing the router push so the transition can sequence first.
+                Link {
+                    to: "/ai-architecture",
                     class: "green-text",
+                    onclick_only: true,
+                    onclick: move |_| {
+                        if !*audio.is_muted.read() {
+                            play_sound("/static/sounds/select.mp3", 0.45);
+                        }
+                        transition.call("/ai-architecture");
+                    },
                     "See AI Architecture →"
                 }
                 " for the general approach behind this: the orchestration, routines, rules, governance, and front-loaded decisions I apply on every project."

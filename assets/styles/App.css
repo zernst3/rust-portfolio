@@ -26,7 +26,13 @@
   animation: fadeIn 1 1s ease-out;
 }
 
-#App>* {
+/* These three (full height, stacking above the fixed background canvas/scrim,
+ * and a positioning context for absolutely-positioned page children like the
+ * Close/Back button) must reach the PAGE root. The `.page-active` transition
+ * wrapper (lib.rs) sits between #App and the page, so target both the wrapper
+ * (direct child) AND the page root inside it. */
+#App>*,
+#App > .page-active > * {
   height: 100%;
   z-index: 100;
   position: relative;

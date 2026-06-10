@@ -114,6 +114,26 @@
   border-left: 2px solid rgba(224, 204, 128, 0.9);
 }
 
+/* Touch devices fire `onmouseenter` on tap, which makes the hover bar flash
+   to the tapped item for a moment before navigating — visually jarring on
+   mobile. The bar is purely a hover affordance (no active/selected state), so
+   hide it entirely where the pointer can't hover. */
+@media (hover: none) {
+  #Home .nav-highlight {
+    display: none !important;
+  }
+}
+
+/* On touch, tapping a menu item flashes the browser-default blue box. With
+   the hover bar hidden on touch (above), that blue tap-flash becomes the
+   only press feedback — so recolor it to the menu's amber selection accent
+   (the leading color of the .nav-highlight gradient) for a coherent look. */
+#Home .menuContainer a,
+#Home .menuContainer div button,
+#Home .mobile-menu-toggle {
+  -webkit-tap-highlight-color: rgba(194, 167, 46, 0.35);
+}
+
 /* Keep every menu item's text/icon above the shared bar. */
 #Home .pageLinks a.navbarItem,
 #Home .links .navbarItem {

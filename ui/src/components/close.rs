@@ -2,12 +2,14 @@ use dioxus::prelude::*;
 
 use crate::audio::play_sound;
 use crate::contexts::audio::use_audio_state;
-use crate::routes::Route;
+use crate::contexts::page_transition::use_nav_with_transition;
 
 /// Close / "Back" button used by detail pages (e.g. SingleExperience).
 ///
-/// Ported from `Close.tsx`. Navigates to `/` via Dioxus `use_navigator`.
-/// Plays `woosh2.mp3` at volume 0.1 on click when not muted.
+/// Ported from `Close.tsx`. Plays `woosh2.mp3` at volume 0.1 on click when
+/// not muted. Navigation goes through `use_nav_with_transition` so the
+/// outgoing page runs its fade+slide-up exit animation before the router
+/// swaps to Home.
 ///
 /// Bug 4 fix: React renders `<button className="close">` (matched by
 /// `#Close button { ... }` in Close.css). The prior Dioxus port used
@@ -19,7 +21,7 @@ use crate::routes::Route;
 #[component]
 pub fn Close() -> Element {
     let audio = use_audio_state();
-    let nav = use_navigator();
+    let transition = use_nav_with_transition();
 
     rsx! {
         div { id: "Close",
@@ -30,7 +32,7 @@ pub fn Close() -> Element {
                     if !*audio.is_muted.read() {
                         play_sound("/static/sounds/woosh2.mp3", 0.1);
                     }
-                    nav.push(Route::Home {});
+                    transition.call("/");
                 },
                 p { "Back" }
             }

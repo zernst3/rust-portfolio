@@ -28,6 +28,7 @@ use dioxus::prelude::*;
 
 use contexts::audio::provide_audio_context;
 use contexts::mobile_menu::provide_mobile_menu_context;
+use contexts::page_transition::provide_page_transition_context;
 use routes::Route;
 
 /// Root Dioxus component.
@@ -43,6 +44,8 @@ use routes::Route;
 pub fn App() -> Element {
     let audio = provide_audio_context();
     provide_mobile_menu_context();
+    let transition = provide_page_transition_context();
+    let is_leaving = transition.is_leaving;
 
     // Animated water cinemagraph background, authored in Rust (web-sys/WebGL).
     // Client-only: use_effect runs after hydration (never on SSR / the server
@@ -167,7 +170,21 @@ pub fn App() -> Element {
         }
 
         div { id: "App",
-            Router::<Route> {}
+            // Wrapper that toggles `page-leaving` while a route transition
+            // is in flight. The outgoing page (still mounted under Router)
+            // fades + slides up via CSS, then `use_nav_with_transition`
+            // fires nav.push, the router swaps, and the new page runs its
+            // own `page-enter` animation. See contexts/page_transition.rs.
+            //
+            // The conditional `class:` is read at the top of `App` (not via
+            // an inline rsx! block here) so SSR and WASM-side render produce
+            // the same tree shape — an inline rsx! interpolation breaks
+            // hydration tree-walking and lands the mount on `<body>`, which
+            // then panics on `length` (see PR commit message for context).
+            div {
+                class: if *is_leaving.read() { "page-active page-leaving" } else { "page-active" },
+                Router::<Route> {}
+            }
         }
     }
 }

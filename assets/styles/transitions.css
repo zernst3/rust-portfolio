@@ -2,20 +2,43 @@
  * Per decision #4 (vanilla CSS transitions + signal helpers). These classes
  * mirror the React pageVariants / pageTransition behavior (opacity + scale). */
 
-/* Page enter: applied to the root wrapper of every page component. */
+/* Page enter: applied to the root wrapper of every page component.
+ * New page rises into view from 12px below + fades in. */
 @keyframes page-enter-kf {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
 .page-enter {
   animation: page-enter-kf 0.2s ease-out forwards;
+}
+
+/* Page leave: applied to the App-level transition wrapper while a route
+ * change is in flight (see contexts/page_transition.rs). The OUTGOING page
+ * continues the same upward motion — slides up another 12px and fades out
+ * — so navigation reads as one continuous rise rather than a swap.
+ *
+ * Kept symmetric with page-enter-kf duration (0.2s) so the hook's delay
+ * before nav.push matches the animation length exactly. */
+@keyframes page-leave-kf {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+.page-leaving {
+  animation: page-leave-kf 0.2s ease-in forwards;
 }
 
 /* Delayed fade-in: used by StartingScreen h1 (Welcome). */
@@ -59,4 +82,23 @@
 @keyframes tile-focused-enter-kf {
   from { opacity: 0; transform: scale(0.96) translateY(12px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* In-component DETAIL CLOSE: the Work picker preview and the AIArchitecture
+ * focused tile are in-component state swaps (not route changes), so they never
+ * hit the route-level page-leave animation. This is their exit: the detail
+ * recedes — fades out and slides back down 12px, the reverse of its rise-in
+ * entrance. Toggled by an `is_closing` signal in each component, which waits
+ * 200ms (matching this duration) before clearing the selection.
+ *
+ * `!important` is required because the AIArchitecture focused tile sets its
+ * entrance animation via an INLINE style attribute, and only `!important` in a
+ * stylesheet can override an inline `animation`. */
+@keyframes detail-leave-kf {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(12px); }
+}
+
+.detail-leaving {
+  animation: detail-leave-kf 0.2s ease-in forwards !important;
 }

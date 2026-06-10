@@ -83,6 +83,9 @@ pub fn ProfessionalExperience() -> Element {
     // Preview entrance: toggled off->on around each selection to force a fresh
     // mount, so the CSS fade-in (.preview-anim) restarts from zero every open.
     let mut preview_shown: Signal<bool> = use_signal(|| true);
+    // Detail exit: while true, the preview container carries `.detail-leaving`
+    // so it plays the fade+slide-down exit before `current` is cleared.
+    let mut is_closing: Signal<bool> = use_signal(|| false);
 
     // Auto-select "scopeAndTrajectory" on desktop on mount.
     //
@@ -147,19 +150,62 @@ pub fn ProfessionalExperience() -> Element {
         if !*audio.is_muted.read() {
             play_sound("/static/sounds/select.mp3", 0.45);
         }
-        current.set(Some(key));
+        // Slide the picker highlight bar to the new item right away.
         measure_bar(key);
-        preview_shown.set(false);
+
+        // Desktop has no Back button — you switch directly between experiences.
+        // So if one is ALREADY open and we're moving to a DIFFERENT one, play
+        // the outgoing exit (`.detail-leaving`) first, then swap and replay the
+        // entrance. First open (nothing showing) skips straight to the entrance.
+        let switching = matches!(*current.peek(), Some(cur) if cur != key);
         let mut shown = preview_shown;
+        // One paint with the body unmounted, then remount, so the entrance
+        // keyframe restarts from zero.
+        let restart_entrance = "await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});});";
+        if switching {
+            is_closing.set(true);
+            spawn(async move {
+                // Outgoing exit — matches `.detail-leaving` (0.2s).
+                document::eval("await new Promise(function(r){setTimeout(r,200);});")
+                    .await
+                    .ok();
+                is_closing.set(false);
+                current.set(Some(key));
+                shown.set(false);
+                document::eval(restart_entrance).await.ok();
+                shown.set(true);
+            });
+        } else {
+            current.set(Some(key));
+            preview_shown.set(false);
+            spawn(async move {
+                document::eval(restart_entrance).await.ok();
+                shown.set(true);
+            });
+        }
+    });
+
+    // Close the open experience with an exit animation: play the back sound,
+    // flag `.detail-leaving` (fade + slide-down via transitions.css), wait the
+    // 200ms exit, THEN clear the selection so the detail animates out instead of
+    // vanishing. Centralizes the old inline `current.set(None)` that every Back
+    // handler used to do directly.
+    let close_experience = use_callback(move |_: ()| {
+        if *is_closing.peek() {
+            return;
+        }
+        if !*audio.is_muted.read() {
+            play_sound("/static/sounds/woosh2.mp3", 0.1);
+        }
+        is_closing.set(true);
         spawn(async move {
-            // One paint with the body unmounted, then remount so the CSS
-            // keyframe fires fresh.
-            document::eval(
-                "await new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});});",
-            )
-            .await
-            .ok();
-            shown.set(true);
+            // Match the `.detail-leaving` duration (0.2s) in transitions.css.
+            document::eval("await new Promise(function(r){setTimeout(r,200);});")
+                .await
+                .ok();
+            current.set(None);
+            bar_visible.set(false);
+            is_closing.set(false);
         });
     });
 
@@ -184,10 +230,13 @@ pub fn ProfessionalExperience() -> Element {
                 div { id: "ProfessionalExperienceInnerContainer",
                     h1 { "Work" }
 
-                    if !is_selected {
-                        p { class: "empty-preview-prompt empty-preview-prompt-mobile",
-                            "Select an item to preview details"
-                        }
+                    // Always mounted (not gated on `is_selected`) so it fades
+                    // out with the picker/h1 via the opacity transition below
+                    // instead of unmounting instantly — which collapsed its
+                    // space and made the page "jump" before the modal slid in.
+                    // CSS fades it to opacity 0 under `.experience-selected`.
+                    p { class: "empty-preview-prompt empty-preview-prompt-mobile",
+                        "Select an item to preview details"
                     }
 
                     div { id: "ProfessionalExperienceContent",
@@ -353,7 +402,8 @@ pub fn ProfessionalExperience() -> Element {
                         div {
                             class: "preview",
                             if preview_shown_val {
-                            div { class: "preview-anim",
+                            div {
+                            class: if *is_closing.read() { "preview-anim detail-leaving" } else { "preview-anim" },
                             {match *current.read() {
                                 None => rsx! {
                                     p { class: "empty-preview-prompt empty-preview-prompt-desktop",
@@ -362,13 +412,7 @@ pub fn ProfessionalExperience() -> Element {
                                 },
                                 Some("credentials") => rsx! {
                                     CredentialsPreview {
-                                        on_back: move |_| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
-                                            }
-                                            current.set(None);
-                                            bar_visible.set(false);
-                                        },
+                                        on_back: move |_| close_experience.call(()),
                                         on_link_hover: move |_| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -383,13 +427,7 @@ pub fn ProfessionalExperience() -> Element {
                                 },
                                 Some("chorale") => rsx! {
                                     ChoralePreview {
-                                        on_back: move |_| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
-                                            }
-                                            current.set(None);
-                                            bar_visible.set(false);
-                                        },
+                                        on_back: move |_| close_experience.call(()),
                                         on_link_hover: move |_| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -404,13 +442,7 @@ pub fn ProfessionalExperience() -> Element {
                                 },
                                 Some("camerata") => rsx! {
                                     CamerataPreview {
-                                        on_back: move |_| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/woosh2.mp3", 0.1);
-                                            }
-                                            current.set(None);
-                                            bar_visible.set(false);
-                                        },
+                                        on_back: move |_| close_experience.call(()),
                                         on_link_hover: move |_| {
                                             if !*audio.is_muted.read() {
                                                 play_sound("/static/sounds/woosh3.mp3", 0.25);
@@ -426,10 +458,7 @@ pub fn ProfessionalExperience() -> Element {
                                 Some(key) => rsx! {
                                     SingleExperience {
                                         experience_key: key,
-                                        on_back: move |_| {
-                                            current.set(None);
-                                            bar_visible.set(false);
-                                        },
+                                        on_back: move |_| close_experience.call(()),
                                     }
                                 },
                             }}

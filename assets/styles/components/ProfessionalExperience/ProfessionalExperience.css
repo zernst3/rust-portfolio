@@ -116,6 +116,14 @@
   width: 100%;
 }
 
+/* Match the Home menu: replace the browser-default blue tap-flash on touch
+   with the amber selection accent (leading color of the highlight gradient),
+   so taps on picker items / buttons / links read as the same accent across
+   the Work page. Inherited by all descendants in WebKit/Blink. */
+#ProfessionalExperienceContainer {
+  -webkit-tap-highlight-color: rgba(194, 167, 46, 0.35);
+}
+
 .picker-highlight {
   position: absolute;
   left: 0;
@@ -124,6 +132,20 @@
   z-index: 0;
   pointer-events: none;
   border-radius: 5px;
+}
+
+/* Same touch fix as the Home menu's nav-highlight: on touch devices the
+   sliding bar flashes to the tapped item for a moment before the modal
+   opens, which is visually jarring. The bar is purely a hover/selection
+   affordance the full-screen mobile modal makes redundant, so hide it
+   where the pointer can't hover. */
+@media (hover: none) {
+  .picker-highlight {
+    display: none !important;
+  }
+}
+
+.picker-highlight {
   background: linear-gradient(90deg,
       rgba(194, 167, 46, 0.7) 0%,
       rgba(189, 157, 86, 0.45) 51%,
@@ -330,6 +352,24 @@
   #ProfessionalExperienceInnerContainer {
     height: auto;
     justify-content: flex-start;
+    /* Hide this scroller's scrollbar chrome entirely (content still scrolls
+       by drag/wheel/touch). On mobile this element is the page scroller
+       (overflow: auto), and selecting an experience flips it to
+       `overflow: hidden` to lock scroll — which, with a CLASSIC scrollbar,
+       reclaims the scrollbar's gutter and shifts the centered content right
+       by ~half its width on click (the "text shifts to the right" bug).
+       `scrollbar-gutter: stable` was supposed to reserve that space but the
+       emulator doesn't honor it on the overflow:hidden flip. Zero-width
+       scrollbar is bulletproof: with no gutter to begin with, there is
+       nothing to reclaim, so nothing shifts — and it matches how a real
+       phone renders this (zero-width overlay scrollbars, no visible bar). */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #ProfessionalExperienceInnerContainer::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   /*
@@ -345,12 +385,14 @@
     Framer Motion on its motion.div root.
   */
   #ProfessionalExperienceContainer > #ProfessionalExperienceInnerContainer > h1,
+  #ProfessionalExperienceContainer > #ProfessionalExperienceInnerContainer > .empty-preview-prompt-mobile,
   #ProfessionalExperienceContainer > #ProfessionalExperienceInnerContainer .picker,
   #ProfessionalExperienceContainer > #Close {
     transition: opacity 0.3s ease-out;
   }
 
   #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer > h1,
+  #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer > .empty-preview-prompt-mobile,
   #ProfessionalExperienceContainer.experience-selected > #ProfessionalExperienceInnerContainer .picker,
   #ProfessionalExperienceContainer.experience-selected > #Close {
     opacity: 0;
@@ -376,9 +418,28 @@
   #ProfessionalExperienceContent {
     display: block;
     flex-direction: column;
+    /* NOTE: this resolves to `auto`, not `visible`. The base rule sets
+       `overflow-x: hidden`, which is not overridden here, and per the CSS
+       spec `overflow-y: visible` paired with a non-visible overflow-x is
+       forced to compute as `auto`. So this element is actually the page
+       scroller and shows a 16px vertical scrollbar. */
     overflow-y: visible;
     box-sizing: border-box;
     padding: 0 10px;
+    /* Hide that scrollbar's chrome (content still scrolls). It's the real
+       culprit behind the "experience menu items shift right on click": this
+       is the scroller whose 16px gutter is reclaimed when selecting flips it
+       to `overflow: hidden`, sliding the centered picker items right by 8px.
+       Zero-width = no gutter ever = no shift, matching real mobile overlay
+       scrollbars. (Verified via the live page: item center moved 174→182px
+       on the overflow flip; with this, it holds.) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge/IE */
+  }
+
+  #ProfessionalExperienceContent::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   .picker a,
@@ -419,6 +480,24 @@
     box-sizing: border-box;
     margin-top: 2rem;
     border-top: 1px solid rgba(var(--text-primary), 0.1);
+    /* Fade the separator out on select instead of removing it instantly
+       (see the experience-selected rule below). */
+    transition: border-top-color 0.3s ease-out;
+  }
+
+  /* When an experience is open, the detail is a transparent full-screen
+     overlay and the page behind it is scroll-locked. The .preview's own
+     top border (a separator for the INLINE, non-selected layout) would
+     otherwise sit frozen behind the scrolling overlay content as a stray
+     fixed line. Earlier this was removed with `border-top: none;
+     margin-top: 0`, but that fired INSTANTLY: the border popped out and the
+     2rem margin collapse nudged the layout a beat before the rest of the
+     page faded ("line disappears" + "text shift"). Instead, fade the border
+     color to transparent over the same 0.3s as the picker/h1/prompt, and
+     leave the margin untouched so nothing reflows. The faded-transparent
+     border still occupies its 1px, so no jump and no lingering line. */
+  #ProfessionalExperienceContainer.experience-selected #ProfessionalExperienceContent .preview {
+    border-top-color: transparent;
   }
 
   .experience-header-picker .header-top,
@@ -684,6 +763,25 @@
     z-index: 1000000000;
     padding: 16px 14px;
     overflow-y: auto;
+  }
+
+  /* Exit animation on mobile. The open detail is a full-screen,
+     position:absolute overlay (#SingleExperienceOuterContainer for the
+     SingleExperience items, .custom-preview for Credentials/Chorale/Camerata)
+     that is a POSITIONED DESCENDANT of .preview-anim. The shared
+     `.detail-leaving` exit animates `transform` on .preview-anim — but the
+     moment a non-`none` transform lands on .preview-anim, it becomes the
+     containing block for those absolute overlays, snapping them from
+     viewport-size down to .preview-anim's tiny static box. They vanish
+     instantly instead of sliding+fading (this is the "mobile back doesn't
+     animate" bug). Fix: neutralize the leave on the ancestor and run it on
+     the overlay element itself, which is safe to transform in place. */
+  .preview-anim.detail-leaving {
+    animation: none !important;
+  }
+
+  .preview-anim.detail-leaving > * {
+    animation: detail-leave-kf 0.2s ease-in forwards !important;
   }
 
   /* Suppress the picker-scroll-container's scrollbar while an experience

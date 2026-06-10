@@ -4,6 +4,7 @@ use serde::Deserialize;
 use crate::audio::play_sound;
 use crate::contexts::audio::use_audio_state;
 use crate::contexts::mobile_menu::use_mobile_menu;
+use crate::contexts::page_transition::use_nav_with_transition;
 
 /// Measured position of a nav item — used by the sliding selection bar.
 #[derive(Clone, Deserialize)]
@@ -109,6 +110,7 @@ const ICON_INFO: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 
 pub fn Home() -> Element {
     let audio = use_audio_state();
     let mobile_menu = use_mobile_menu();
+    let transition = use_nav_with_transition();
 
     // Extract writable signal handles. Signal is Copy so these are independent
     // handles to the same underlying storage — mutations go through them.
@@ -269,10 +271,18 @@ pub fn Home() -> Element {
                                         to: item.link,
                                         class: "navbarItem",
                                         active_class: "active",
+                                        // onclick_only: true tells Dioxus's Link to skip its built-in
+                                        // router push and only run our onclick. We navigate via
+                                        // use_nav_with_transition so the exit animation plays first.
+                                        // Modifier-key / new-tab / middle-click handling stays native:
+                                        // Link returns early in those cases without calling onclick
+                                        // (dioxus-router/src/components/link.rs:204-217).
+                                        onclick_only: true,
                                         onclick: move |_| {
                                             if !*is_muted.peek() {
                                                 play_sound("/static/sounds/select.mp3", 0.45);
                                             }
+                                            transition.call(item.link);
                                         },
                                         li {
                                             // Hover events on li: Link doesn't expose onmouseenter.

@@ -13,6 +13,23 @@ use crate::App;
 /// custom `index.html`) and replaces dioxus-cli's default prod template,
 /// which is missing `<html lang>` and the meta description — Lighthouse
 /// flags both.
+///
+/// IMPORTANT: `ui/index.html` MUST contain a real `<title>` tag (any value;
+/// `document::Title` in `lib.rs` overrides it at render time). Without one,
+/// dioxus-server's `IndexHtml::new` parser at
+/// `~/.cargo/registry/.../dioxus-server-0.7.9/src/index_html.rs:71-81`
+/// leaves `head_before_title` empty and the DOCTYPE falls into
+/// `head_after_title`, which SSR emits AFTER the dynamic title — triggering
+/// browser quirks mode (Lighthouse Best Practices drops from 100).
+///
+/// ALSO: do not include literal `<title>` text in HTML comments inside
+/// `ui/index.html`. The parser does a raw `split_once("<title>")` and will
+/// match comment text before the real tag, mangling the head-segment
+/// boundaries and producing SSR output where `#main` is no longer where the
+/// WASM hydration step expects to find it (manifests as
+/// `element '#main' not found. mounting to the body.` in the browser
+/// console followed by a `length` undefined panic). This caveat documented
+/// in Rust comments here, not HTML comments in the template.
 const ROBOTS_TXT: &str = include_str!("../robots.txt");
 
 async fn robots_txt() -> impl IntoResponse {
