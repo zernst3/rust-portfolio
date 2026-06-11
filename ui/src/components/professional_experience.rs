@@ -38,6 +38,8 @@ const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("In-cell editing", "—", "✓"),
     ("Grouping + aggregation", "—", "✓"),
     ("Master / detail rows", "—", "✓"),
+    ("Row-aware cell renderers", "—", "✓"),
+    ("Row click callback", "—", "✓"),
     ("i18n / custom labels", "—", "✓"),
     ("Leptos bindings", "—", "✓"),
     ("Derive macro (TableRow)", "—", "✓"),
