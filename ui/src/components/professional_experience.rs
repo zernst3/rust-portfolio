@@ -583,7 +583,7 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 p {
                     strong { class: "green-text", "v0.2.0 is feature-complete and currently in testing" }
                     ", now with "
-                    strong { class: "green-text", "349 passing unit tests" }
+                    strong { class: "green-text", "397 passing unit tests" }
                     "."
                 }
                 a {
