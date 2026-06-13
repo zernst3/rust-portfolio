@@ -41,6 +41,7 @@ const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("Row-aware cell renderers", "—", "✓"),
     ("Row click callback", "—", "✓"),
     ("i18n / custom labels", "—", "✓"),
+    ("Out-of-the-box light / dark themes", "—", "✓"),
     ("Leptos bindings", "—", "✓"),
     ("Derive macro (TableRow)", "—", "✓"),
 ];
