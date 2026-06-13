@@ -599,18 +599,18 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 }
             }
             img {
-                src: "/static/images/chorale-qa-harness.png",
-                alt: "Chorale QA harness showing a 10,010-row data table with sorting, filtering, virtualization, selection, column visibility, CSV export, and column resize enabled",
+                src: "/static/images/chorale-v0.2.0-dioxus-example.png",
+                alt: "Chorale v0.2.0 rendered with the Dioxus adapter, showing a data table with sorting, filtering, virtualization, selection, column visibility, and export",
                 class: "custom-preview-image",
             }
             p {
                 "A headless, virtualized table library for "
-                strong { class: "green-text", "Rust and Dioxus" }
+                strong { class: "green-text", "Rust, with Dioxus and Leptos adapters" }
                 ", published to crates.io."
             }
             img {
-                src: "/static/images/chorale-custom-cells.png",
-                alt: "Chorale custom cell rendering example with Service, Status, and Health columns, showing badge variants and arbitrary Dioxus markup keyed by column id",
+                src: "/static/images/chorale-v0.2.0-leptos-example.png",
+                alt: "Chorale v0.2.0 rendered with the Leptos adapter, demonstrating the same headless core driving a second Rust UI framework",
                 class: "custom-preview-image",
             }
             p {
