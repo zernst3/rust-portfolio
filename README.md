@@ -1,6 +1,6 @@
 # rust-portfolio
 
-Full-stack Rust port of Zach's portfolio site (zachary-ernst.dev), built as a single-binary Axum + Dioxus Fullstack monolith with a Bevy-rendered 3D background.
+Full-stack Rust port of Zach's portfolio site (zachary-ernst.dev), built as a single-binary Axum + Dioxus Fullstack monolith.
 
 Status: v0.1 scaffold. Bot-orchestrated port in progress.
 
