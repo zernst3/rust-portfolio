@@ -33,7 +33,13 @@ use crate::App;
 const ROBOTS_TXT: &str = include_str!("../robots.txt");
 
 async fn robots_txt() -> impl IntoResponse {
-    ([(axum::http::header::CONTENT_TYPE, "text/plain; charset=utf-8")], ROBOTS_TXT)
+    (
+        [(
+            axum::http::header::CONTENT_TYPE,
+            "text/plain; charset=utf-8",
+        )],
+        ROBOTS_TXT,
+    )
 }
 
 /// Build the Axum router: SSR fallback + validated API handlers + static assets.
