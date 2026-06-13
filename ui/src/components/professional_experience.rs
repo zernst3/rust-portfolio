@@ -577,14 +577,15 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
             div { class: "custom-preview-meta",
                 span { class: "custom-preview-tag", "Open Source" }
                 span { class: "custom-preview-dot", "·" }
-                span { class: "custom-preview-date", "v0.2.0 in testing" }
+                span { class: "custom-preview-date", "v0.2.0 on crates.io" }
             }
             // v0.2.0 status snippet + live example.
             div { class: "chorale-status",
                 p {
-                    strong { class: "green-text", "v0.2.0 is feature-complete and currently in testing" }
+                    "v0.2.0 is "
+                    strong { class: "green-text", "released on crates.io" }
                     ", now with "
-                    strong { class: "green-text", "397 passing unit tests" }
+                    strong { class: "green-text", "423 passing tests" }
                     "."
                 }
                 a {
