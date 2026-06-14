@@ -577,16 +577,18 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
             div { class: "custom-preview-meta",
                 span { class: "custom-preview-tag", "Open Source" }
                 span { class: "custom-preview-dot", "·" }
-                span { class: "custom-preview-date", "v0.2.0 on crates.io" }
+                span { class: "custom-preview-date", "v0.2.2 on crates.io" }
             }
-            // v0.2.0 status snippet + live example.
+            // v0.2.2 status snippet + live example.
             div { class: "chorale-status",
                 p {
-                    "v0.2.0 is "
+                    "v0.2.2 is "
                     strong { class: "green-text", "released on crates.io" }
                     ", now with "
-                    strong { class: "green-text", "423 passing tests" }
-                    "."
+                    strong { class: "green-text", "429 passing tests" }
+                    ". The latest release adds full keyboard navigation for "
+                    "master/detail child tables and a row-set mutation API "
+                    "(append, insert, remove, reset) for live data."
                 }
                 a {
                     class: "custom-preview-cta",
