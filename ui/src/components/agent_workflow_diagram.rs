@@ -133,7 +133,7 @@ pub fn AgentWorkflowDiagram() -> Element {
                     g { class: "hard-guards",
                         rect { x: "320", y: "350", width: "320", height: "70", rx: "6", class: "guard-rect" }
                         text { x: "480", y: "378", class: "guard-title", text_anchor: "middle",
-                            "HARD GUARDS — never auto-modified"
+                            "HARD GUARDS: never auto-modified"
                         }
                         text { x: "480", y: "400", class: "guard-subtext", text_anchor: "middle",
                             "auth · payments · migrations"

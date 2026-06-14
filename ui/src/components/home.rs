@@ -53,7 +53,7 @@ static NAV_ITEMS: &[NavItem] = &[
 ];
 
 static LINK_ITEMS: &[LinkItem] = &[
-    LinkItem { label: "My Resume",        href: "https://1drv.ms/b/c/2284c063c81ee480/Ee6UQk1nDqxBrHc0NCMPHZoBLolQDGf2z0kSWkY_sE10qw?e=NRvCaC" },
+    LinkItem { label: "My Resume",        href: "/static/Ernst_Zachary.pdf" },
     LinkItem { label: "My Github",        href: "https://github.com/zernst3" },
     LinkItem { label: "My LinkedIn",      href: "https://www.linkedin.com/in/zernst3/" },
     LinkItem { label: "My Medium",        href: "https://zacharyernst.medium.com/" },
@@ -61,13 +61,11 @@ static LINK_ITEMS: &[LinkItem] = &[
 ];
 
 static HEADER_STRINGS: &[&str] = &[
-    "Technical Lead @ S&P Global Market Intelligence | Enterprise Architecture",
-    "Creator & Lead Engineer | Building The New Agora (Independent Project)",
     "AI-native development for clean, consistent and scalable code",
-    "Aligning distributed contributors to one architecture across time zones",
-    "Building robust digital infrastructure for the systems that shape our environment",
-    "Ensuring resilient, secure and scalable ground-up systems",
     "Building in Rust through AI orchestration, this site included",
+    "Creator & Lead Engineer | Building The New Agora (Independent Project)",
+    "Technical Lead @ S&P Global Market Intelligence | Enterprise Architecture",
+    "Aligning distributed contributors to one architecture across time zones",
 ];
 
 // ── Inline SVG icons (Material Design, 24×24 viewBox) ─────────────────────

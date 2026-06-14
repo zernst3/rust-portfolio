@@ -39,10 +39,10 @@ const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("Column reorder", "—", "✓"),
     ("Frozen columns", "—", "✓"),
     ("In-cell editing", "—", "✓"),
+    ("Range selection, fill & clipboard", "—", "✓"),
     ("Grouping + aggregation", "—", "✓"),
     ("Master / detail rows", "—", "✓"),
     ("Row-aware cell renderers", "—", "✓"),
-    ("Row click callback", "—", "✓"),
     ("i18n / custom labels", "—", "✓"),
     ("Out-of-the-box light / dark themes", "—", "✓"),
     ("Leptos bindings", "—", "✓"),
@@ -109,7 +109,7 @@ pub fn ProfessionalExperience() -> Element {
             let eval = document::eval("dioxus.send(window.innerWidth > 1050)");
             if let Ok(v) = eval.await {
                 if v.as_bool().unwrap_or(false) {
-                    current.set(Some("scopeAndTrajectory"));
+                    current.set(Some("builtEndToEnd"));
                 }
             }
         });
@@ -264,58 +264,7 @@ pub fn ProfessionalExperience() -> Element {
                                 // Sliding highlight bar
                                 div { class: "picker-highlight", style: "{bar_style}" }
 
-                                // ─── Bucket 1: Credentials ───────────────────
-                                div { class: "bucket-header", "Credentials" }
-
-                                div { class: "experience-group",
-                                    PickerItem {
-                                        exp_key: "credentials",
-                                        current: current,
-                                        on_select: move |key| open_experience.call(key),
-                                        on_hover: move |key| {
-                                            if !*audio.is_muted.read() {
-                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
-                                            }
-                                            hovered.set(Some(key));
-                                            measure_bar(key);
-                                        },
-                                    }
-                                }
-
-                                // ─── S&P Global ───────────────────────────────
-                                div { class: "experience-group",
-                                    div { class: "experience-header-picker",
-                                        div { class: "header-top",
-                                            span { class: "entity-name",
-                                                img { src: "/static/images/finance.svg", alt: "", class: "header-icon-svg" }
-                                                " S&P Global Market Intelligence"
-                                            }
-                                            span { class: "dots" }
-                                            span { class: "date", "Feb 2021 – Present" }
-                                        }
-                                        div { class: "header-bottom",
-                                            span { class: "title green-text", "Technical Lead" }
-                                            span { class: "location", "Remote, USA & EMEA" }
-                                        }
-                                    }
-                                    {SP_ITEMS.iter().map(|key| rsx! {
-                                        PickerItem {
-                                            key: "{key}",
-                                            exp_key: key,
-                                            current: current,
-                                            on_select: move |k| open_experience.call(k),
-                                            on_hover: move |k| {
-                                                if !*audio.is_muted.read() {
-                                                    play_sound("/static/sounds/woosh3.mp3", 0.25);
-                                                }
-                                                hovered.set(Some(k));
-                                                measure_bar(k);
-                                            },
-                                        }
-                                    })}
-                                }
-
-                                // ─── Bucket 2: Independent Work ───────────────
+                                // ─── Independent Work (lead) ──────────────────
                                 div { class: "bucket-header", "Independent Work" }
 
                                 // The New Agora
@@ -400,6 +349,60 @@ pub fn ProfessionalExperience() -> Element {
                                             }
                                             hovered.set(Some(k));
                                             measure_bar(k);
+                                        },
+                                    }
+                                }
+
+                                // ─── Professional Experience ──────────────────
+                                div { class: "bucket-header", "Professional Experience" }
+
+                                // ─── S&P Global (professional, supporting) ────
+                                div { class: "experience-group",
+                                    div { class: "experience-header-picker",
+                                        div { class: "header-top",
+                                            span { class: "entity-name",
+                                                img { src: "/static/images/finance.svg", alt: "", class: "header-icon-svg" }
+                                                " S&P Global Market Intelligence"
+                                            }
+                                            span { class: "dots" }
+                                            span { class: "date", "Feb 2021 – Present" }
+                                        }
+                                        div { class: "header-bottom",
+                                            span { class: "title green-text", "Technical Lead" }
+                                            span { class: "location", "Remote, USA & EMEA" }
+                                        }
+                                    }
+                                    {SP_ITEMS.iter().map(|key| rsx! {
+                                        PickerItem {
+                                            key: "{key}",
+                                            exp_key: key,
+                                            current: current,
+                                            on_select: move |k| open_experience.call(k),
+                                            on_hover: move |k| {
+                                                if !*audio.is_muted.read() {
+                                                    play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                                }
+                                                hovered.set(Some(k));
+                                                measure_bar(k);
+                                            },
+                                        }
+                                    })}
+                                }
+
+                                // ─── Credentials ──────────────────────────────
+                                div { class: "bucket-header", "Credentials" }
+
+                                div { class: "experience-group",
+                                    PickerItem {
+                                        exp_key: "credentials",
+                                        current: current,
+                                        on_select: move |key| open_experience.call(key),
+                                        on_hover: move |key| {
+                                            if !*audio.is_muted.read() {
+                                                play_sound("/static/sounds/woosh3.mp3", 0.25);
+                                            }
+                                            hovered.set(Some(key));
+                                            measure_bar(key);
                                         },
                                     }
                                 }
@@ -696,7 +699,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
             p {
                 "A personal project that codifies the architectural approach I use, packaged as a "
                 strong { class: "green-text", "Rust CLI and Dioxus GUI" }
-                ". It generates machine-enforceable AI-agent config (AGENTS.md, CONVENTIONS.md) from ~95 starter principles, each a TOML rule with explicit alternatives and a test for what qualifies."
+                ". It generates machine-enforceable AI-agent config (AGENTS.md, CONVENTIONS.md) from over 100 starter principles, each a TOML rule with explicit alternatives and a test for what qualifies."
             }
             img {
                 src: "/static/images/camerata-principle.png",

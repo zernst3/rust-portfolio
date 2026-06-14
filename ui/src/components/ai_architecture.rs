@@ -12,6 +12,7 @@ const ICON_GAVEL: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0
 const ICON_VERIFIED: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="2rem" height="2rem" fill="currentColor"><path d="m23 12-2.44-2.79.34-3.69-3.61-.82-1.89-3.2L12 2.96 8.6 1.5 6.71 4.69 3.1 5.5l.34 3.7L1 12l2.44 2.79-.34 3.7 3.61.82L8.6 22.5l3.4-1.47 3.4 1.46 1.89-3.19 3.61-.82-.34-3.69zm-12.91 4.72-3.8-3.81 1.48-1.48 2.32 2.33 5.85-5.87 1.48 1.48z"/></svg>"#;
 const ICON_FORWARD_TO_INBOX: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="2rem" height="2rem" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h9v-2H4V8l8 5 8-5v5h2V6c0-1.1-.9-2-2-2m-8 7L4 6h16zm7 4 4 4-4 4v-3h-4v-2h4z"/></svg>"#;
 const ICON_PERSON: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="2.25rem" height="2.25rem" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4"/></svg>"#;
+const ICON_VISIBILITY: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="2rem" height="2rem" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5m0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>"#;
 
 struct Detail {
     heading: &'static str,
@@ -22,6 +23,8 @@ enum DetailBody {
     Text(&'static str),
     // Camerata detail has an embedded external link.
     Camerata,
+    // Chorale-bug detail (the "Judgment" tile) has an embedded external link.
+    ChoraleBug,
 }
 
 struct Tile {
@@ -177,6 +180,26 @@ static TILES: &[Tile] = &[
             },
         ],
     },
+    Tile {
+        id: 6,
+        title: "Judgment",
+        icon: ICON_VISIBILITY,
+        summary: "A real example of what the human review loop catches that the rules cannot.",
+        details: &[
+            Detail {
+                heading: "A bug that passed every test",
+                body: DetailBody::Text("In Chorale, the table re-ran a full filter, sort and clone of the entire dataset twice on every render, and triggered it again on every scroll event. On a ten-thousand-row grid, fast scrolling re-sorted ten thousand rows twice per scroll tick. Every unit test passed."),
+            },
+            Detail {
+                heading: "Why the tests could not see it",
+                body: DetailBody::Text("The defect lived in the wiring between pure functions, not inside any one of them. Each function was correct in isolation, so its unit test passed. The bug only existed in how they were composed, which is exactly the seam automated tests rarely cover."),
+            },
+            Detail {
+                heading: "Caught in review, fixed, documented",
+                body: DetailBody::ChoraleBug,
+            },
+        ],
+    },
 ];
 
 #[component]
@@ -309,13 +332,25 @@ pub fn AIArchitecture() -> Element {
                                                         DetailBody::Text(t) => rsx! { p { "{t}" } },
                                                         DetailBody::Camerata => rsx! {
                                                             p {
-                                                                "The codification approach above — rules with stable IDs, real alternatives, and an explicit \"why\" — is packaged as Camerata, my open-source library that lets any project declare these architectural commitments to its AI agents in a portable format. The repo ships ~96 starter principles and the schema for declaring your own. "
+                                                                "The codification approach above (rules with stable IDs, real alternatives, and an explicit \"why\") is packaged as Camerata, my open-source library that lets any project declare these architectural commitments to its AI agents in a portable format. The repo ships over 100 starter principles and the schema for declaring your own. "
                                                                 a {
                                                                     href: "https://github.com/zernst3/camerata-ai",
                                                                     target: "_blank",
                                                                     rel: "noopener noreferrer",
                                                                     class: "green-text",
                                                                     "github.com/zernst3/camerata-ai"
+                                                                }
+                                                            }
+                                                        },
+                                                        DetailBody::ChoraleBug => rsx! {
+                                                            p {
+                                                                "It surfaced in a review pass, not from a failing test. I memoized the work behind a single derived view, removed the double pass, added a regression test, and kept the crate clippy-pedantic-clean, then documented the honest residual left for a later release. The doubt about AI-written code rests on the assumption that nobody is watching. The watching is the point. "
+                                                                a {
+                                                                    href: "https://github.com/zernst3/rust-chorale",
+                                                                    target: "_blank",
+                                                                    rel: "noopener noreferrer",
+                                                                    class: "green-text",
+                                                                    "github.com/zernst3/rust-chorale"
                                                                 }
                                                             }
                                                         },
