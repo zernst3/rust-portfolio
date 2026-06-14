@@ -19,9 +19,12 @@ const AGORA_ITEMS: &[&str] = &[
     "infrastructureAndSecurity",
 ];
 
-// Chorale v0.1.0 → v0.2.0 capability comparison, sourced from the chorale
-// CHANGELOG (v0.2.0, 2026-06-05). "✓" = included, "—" = not in that version,
-// text = a qualified capability that grew between versions.
+// Chorale v0.1.0 → v0.2.* capability comparison, sourced from the chorale
+// CHANGELOG (through v0.2.2, 2026-06-14). "✓" = included, "—" = not in that
+// version, text = a qualified capability that grew between versions. The right
+// column spans the whole 0.2.x line, so capabilities added in 0.2.1/0.2.2 (no
+// new features landed in 0.2.1; row-set mutation and full keyboard navigation
+// landed in 0.2.2) show "✓" there.
 const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("Headless core + Dioxus", "✓", "✓"),
     ("Row virtualization", "Fixed height", "Fixed + variable"),
@@ -44,6 +47,8 @@ const CHORALE_FEATURES: &[(&str, &str, &str)] = &[
     ("Out-of-the-box light / dark themes", "—", "✓"),
     ("Leptos bindings", "—", "✓"),
     ("Derive macro (TableRow)", "—", "✓"),
+    ("Row-set mutation (live data)", "—", "✓"),
+    ("Keyboard navigation (incl. master/detail)", "—", "✓"),
 ];
 
 /// Cell class for a feature-table value: accent for included, muted for absent,
@@ -620,14 +625,14 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 strong { class: "green-text", "clippy-pedantic-clean" }
                 ", fully tested, unsafe forbidden. Built to demonstrate that AI orchestration can hold a real quality standard, not just move fast."
             }
-            // v0.1.0 vs v0.2.0 capability comparison.
-            h3 { class: "custom-preview-h3", "v0.1.0 vs v0.2.0" }
+            // v0.1.0 vs v0.2.* capability comparison.
+            h3 { class: "custom-preview-h3", "v0.1.0 vs v0.2.*" }
             table { class: "feature-table",
                 thead {
                     tr {
                         th { "Capability" }
                         th { "v0.1.0" }
-                        th { "v0.2.0" }
+                        th { "v0.2.*" }
                     }
                 }
                 tbody {
