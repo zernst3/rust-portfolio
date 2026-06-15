@@ -3,6 +3,7 @@ use dioxus::prelude::*;
 use crate::audio::play_sound;
 use crate::components::single_experience::SingleExperience;
 use crate::components::Close;
+use crate::components::ChoraleArchitectureDiagram;
 use crate::contexts::audio::use_audio_state;
 
 // All picker item keys in display order.
@@ -628,6 +629,9 @@ fn ChoralePreview(props: ChoralePreviewProps) -> Element {
                 strong { class: "green-text", "clippy-pedantic-clean" }
                 ", fully tested, unsafe forbidden. Built to demonstrate that AI orchestration can hold a real quality standard, not just move fast."
             }
+            // Architecture diagram: where state lives + the write/read paths.
+            h3 { class: "custom-preview-h3", "How it works" }
+            ChoraleArchitectureDiagram {}
             // v0.1.0 vs v0.2.* capability comparison.
             h3 { class: "custom-preview-h3", "v0.1.0 vs v0.2.*" }
             table { class: "feature-table",

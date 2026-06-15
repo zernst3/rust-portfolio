@@ -1,5 +1,6 @@
 pub mod agent_workflow_diagram;
 pub mod ai_architecture;
+pub mod chorale_architecture_diagram;
 pub mod cicd_pipeline_diagram;
 pub mod close;
 pub mod contact_me;
@@ -17,6 +18,7 @@ pub mod writing;
 
 pub use agent_workflow_diagram::AgentWorkflowDiagram;
 pub use ai_architecture::AIArchitecture;
+pub use chorale_architecture_diagram::ChoraleArchitectureDiagram;
 pub use cicd_pipeline_diagram::CICDPipelineDiagram;
 pub use close::Close;
 pub use contact_me::ContactMe;
