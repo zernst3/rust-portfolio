@@ -332,13 +332,13 @@ pub fn AIArchitecture() -> Element {
                                                         DetailBody::Text(t) => rsx! { p { "{t}" } },
                                                         DetailBody::Camerata => rsx! {
                                                             p {
-                                                                "The codification approach above (rules with stable IDs, real alternatives, and an explicit \"why\") is packaged as Camerata, my open-source library that lets any project declare these architectural commitments to its AI agents in a portable format. The repo ships over 100 starter principles and the schema for declaring your own. "
+                                                                "The codification approach above (rules with stable IDs, real alternatives, and an explicit \"why\") is the corpus inside Camerata, my governance engine for AI coding agents, built in Rust. It audits a codebase against these rules today, and its architecture is built to enforce them on agent output during development. The repo ships over 100 starter principles and the schema for declaring your own. "
                                                                 a {
-                                                                    href: "https://github.com/zernst3/camerata-ai",
+                                                                    href: "https://github.com/zernst3/camerata-orchestrator",
                                                                     target: "_blank",
                                                                     rel: "noopener noreferrer",
                                                                     class: "green-text",
-                                                                    "github.com/zernst3/camerata-ai"
+                                                                    "github.com/zernst3/camerata-orchestrator"
                                                                 }
                                                             }
                                                         },

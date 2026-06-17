@@ -308,17 +308,17 @@ pub fn ProfessionalExperience() -> Element {
                                     })}
                                 }
 
-                                // Chorale
+                                // Camerata
                                 div { class: "experience-group",
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
-                                            span { class: "entity-name", "Chorale" }
+                                            span { class: "entity-name", "Camerata" }
                                             span { class: "dots" }
-                                            span { class: "date", "Rust · Dioxus · crates.io" }
+                                            span { class: "date", "Rust · governance engine" }
                                         }
                                     }
                                     PickerItem {
-                                        exp_key: "chorale",
+                                        exp_key: "camerata",
                                         current: current,
                                         on_select: move |k| open_experience.call(k),
                                         on_hover: move |k| {
@@ -331,17 +331,17 @@ pub fn ProfessionalExperience() -> Element {
                                     }
                                 }
 
-                                // Camerata
+                                // Chorale
                                 div { class: "experience-group",
                                     div { class: "experience-header-picker",
                                         div { class: "header-top",
-                                            span { class: "entity-name", "Camerata" }
+                                            span { class: "entity-name", "Chorale" }
                                             span { class: "dots" }
-                                            span { class: "date", "v0.1.0 · May 2026" }
+                                            span { class: "date", "Rust · Dioxus · crates.io" }
                                         }
                                     }
                                     PickerItem {
-                                        exp_key: "camerata",
+                                        exp_key: "chorale",
                                         current: current,
                                         on_select: move |k| open_experience.call(k),
                                         on_hover: move |k| {
@@ -691,29 +691,57 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
         div { class: "custom-preview camerata-preview",
             h2 { "Camerata" }
             div { class: "custom-preview-meta",
-                span { class: "custom-preview-tag", "Open Source" }
+                span { class: "custom-preview-tag", "Governance Engine" }
                 span { class: "custom-preview-dot", "·" }
-                span { class: "custom-preview-date", "v0.1.0, May 2026" }
+                span { class: "custom-preview-date", "Rust" }
+            }
+            p {
+                "A deterministic, "
+                strong { class: "green-text", "provider-neutral" }
+                " governance engine for AI coding agents, built in Rust. Point it at a repository and it detects the stack, proposes a ruleset from its corpus, and audits the code against it."
             }
             img {
-                src: "/static/images/camerata-overview.png",
-                alt: "Camerata desktop GUI showing the principle selection view, with domains and rules listed for adoption",
+                src: "/static/images/camerata-proposed-ruleset.png",
+                alt: "Camerata's proposed starter ruleset: the detected stack and suggested rules grouped by domain, each with a scope and a gate placement, ready to adopt or swap",
                 class: "custom-preview-image",
             }
             p {
-                "A personal project that codifies the architectural approach I use, packaged as a "
-                strong { class: "green-text", "Rust CLI and Dioxus GUI" }
-                ". It generates machine-enforceable AI-agent config (AGENTS.md, CONVENTIONS.md) from over 100 starter principles, each a TOML rule with explicit alternatives and a test for what qualifies."
+                "The brownfield audit is the working core. It runs a deterministic security floor (hardcoded secrets, raw SQL, secrets in URLs) alongside an AI architectural review, and you choose the model tier and scan mode with the cost shown before you run."
             }
             img {
-                src: "/static/images/camerata-principle.png",
-                alt: "Camerata desktop GUI showing a single principle's detail view with summary, why, and adoption options",
+                src: "/static/images/camerata-audit-run.png",
+                alt: "Camerata's audit screen: an audit-model and calibration-model selector, a scan-mode selector, a live cost estimate, and parallel agent batches reporting progress",
                 class: "custom-preview-image",
             }
-            p { "Built to demonstrate how I think about standards-as-code, not as a maintained product." }
+            p {
+                "Every finding lands in one table with its severity, its authority (deterministic and enforced, or advisory and review-only), and a disposition flow: fix it, waive it with a recorded reason, or accept it as tracked tech debt."
+            }
+            img {
+                src: "/static/images/camerata-findings-table.png",
+                alt: "Camerata's findings table, grouped by rule then file then line, with severity, authority, and enforcement columns and a toolbar for ignoring, resolving, or accepting findings",
+                class: "custom-preview-image",
+            }
+            p {
+                "Each finding explains itself against the actual code: the rule it broke, what the code does, and every other rule it violates at the same location."
+            }
+            img {
+                src: "/static/images/camerata-finding-explanation.png",
+                alt: "A Camerata finding detail: the violated rule, a code-grounded explanation of the layering violation, and the other rule it also violates at that location",
+                class: "custom-preview-image",
+            }
+            img {
+                src: "/static/images/camerata-finding-in-context.png",
+                alt: "A Camerata finding explanation shown over the full findings list, with the deterministic security findings pinned at the top",
+                class: "custom-preview-image",
+            }
+            p {
+                "The architecture extends this toward development-time governance: a "
+                strong { class: "green-text", "deny-before-execute MCP gateway" }
+                " designed to block a disallowed agent action before it reaches disk, with a post-task structural check that bounces violations back for revision."
+            }
             a {
                 class: "custom-preview-cta",
-                href: "https://github.com/zernst3/camerata-ai",
+                href: "https://github.com/zernst3/camerata-orchestrator",
                 target: "_blank",
                 rel: "noopener noreferrer",
                 onmouseenter: move |_| props.on_link_hover.call(()),
