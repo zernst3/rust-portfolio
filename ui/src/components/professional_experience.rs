@@ -696,9 +696,7 @@ fn CamerataPreview(props: CamerataPreviewProps) -> Element {
                 span { class: "custom-preview-date", "Rust" }
             }
             p {
-                "A deterministic, "
-                strong { class: "green-text", "provider-neutral" }
-                " governance engine for AI coding agents, built in Rust. Point it at a repository and it detects the stack, proposes a ruleset from its corpus, and audits the code against it."
+                "I set out to build Camerata because managing multiple AI agents across multiple projects through conversational chat alone became unwieldy, and frankly cognitively tiring. The governance itself worked: my rules held and code quality stayed high. But routines would fail silently, and I often wouldn't know a run had failed until I went and asked the agent about it. The missing piece was never the governance, it was a structured place for it to live: status and state visible and managed in a real interface, instead of buried in chat. That is what Camerata is: a structured management layer for orchestrating AI agents across any number of projects."
             }
             img {
                 src: "/static/images/camerata-proposed-ruleset.png",
