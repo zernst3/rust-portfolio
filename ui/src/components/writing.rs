@@ -14,6 +14,13 @@ struct Article {
 
 static ARTICLES: &[Article] = &[
     Article {
+        title: "How AI Software Development Changes The Premature Optimization Paradigm",
+        publication: "Medium",
+        date: "June 2026",
+        snippet: "An essay on how AI collapses the cost of writing optimized code, why that inverts Knuth's old \"premature optimization\" tradeoff, and where the line still holds: the judgment of what is worth building, which AI never made cheap.",
+        url: "https://medium.com/@zacharyernst/how-ai-software-development-changes-the-premature-optimization-paradigm-7a846446011a",
+    },
+    Article {
         title: "Codifying \"Less is More\" AI Enforcement",
         publication: "Medium",
         date: "June 2026",
