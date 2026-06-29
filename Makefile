@@ -20,7 +20,7 @@ check:
 # so a new invocation errors and the browser keeps showing the old build).
 .PHONY: serve
 serve:
-	-pkill -9 -f "dx serve" 2>/dev/null; pkill -9 -f "target/dx" 2>/dev/null; lsof -ti:8080 | xargs -r kill -9 2>/dev/null; sleep 1
+	-pkill -9 -f "dx serve" 2>/dev/null; pkill -9 -f "target/dx" 2>/dev/null; pkill -9 -f "wasm-opt" 2>/dev/null; lsof -ti:8080 | xargs -r kill -9 2>/dev/null; sleep 1
 	dx serve --platform web --release --package ui
 
 # Production bundle (what the Docker builder runs). Emits the server binary and
