@@ -28,7 +28,7 @@ pub async fn contact(Json(body): Json<ContactRequest>) -> StatusCode {
     // drops it — delivered in Mailgun's log, but never in the inbox. The human
     // reply target goes in Reply-To instead.
     let from_addr = format!("Zachary Ernst <no-reply@{domain}>");
-    let owner = "Zachary Ernst <zernst3@live.com>";
+    let owner = "Zachary Ernst <zernst3@gmail.com>";
 
     let vars_thank_you = format!(
         r#"{{"recipient_name": "{}"}}"#,
@@ -45,7 +45,7 @@ pub async fn contact(Json(body): Json<ContactRequest>) -> StatusCode {
     let thank_you_params: &[(&str, &str)] = &[
         ("from", from_addr.as_str()),
         ("to", email),
-        ("h:Reply-To", "zernst3@live.com"),
+        ("h:Reply-To", "zernst3@gmail.com"),
         ("subject", "Thank You for your Email"),
         ("template", "thank_you_email"),
         ("h:X-Mailgun-Variables", &vars_thank_you),

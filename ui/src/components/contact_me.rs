@@ -110,16 +110,16 @@ pub fn ContactMe() -> Element {
                                 h2 {
                                     "There has been an error, please contact me directly instead: "
                                     a {
-                                        href: "mailto:zernst3@live.com",
+                                        href: "mailto:zernst3@gmail.com",
                                         rel: "noreferrer",
                                         target: "_blank",
                                         dangerous_inner_html: "{ICON_ALTERNATE_EMAIL}",
                                     }
                                     a {
-                                        href: "mailto:zernst3@live.com",
+                                        href: "mailto:zernst3@gmail.com",
                                         rel: "noreferrer",
                                         target: "_blank",
-                                        "zernst3@live.com"
+                                        "zernst3@gmail.com"
                                     }
                                 }
                             }
@@ -180,11 +180,11 @@ pub fn ContactMe() -> Element {
                                 div { id: "DirectContact",
                                     h3 { "Or, to get in touch with me directly, please contact me at:" }
                                     a {
-                                        href: "mailto:zernst3@live.com",
+                                        href: "mailto:zernst3@gmail.com",
                                         rel: "noreferrer",
                                         target: "_blank",
                                         span { dangerous_inner_html: "{ICON_ALTERNATE_EMAIL}" }
-                                        " zernst3@live.com"
+                                        " zernst3@gmail.com"
                                     }
                                 }
                             }
