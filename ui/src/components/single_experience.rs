@@ -54,6 +54,8 @@ pub fn SingleExperience(props: SingleExperienceProps) -> Element {
 fn experience_name(key: &str) -> &'static str {
     match key {
         "scopeAndTrajectory" => "Scope & Trajectory",
+        "aiNativeDeliveryTooling" => "AI-Native Delivery Tooling",
+        "pythonServices" => "Python Services",
         "realTimeSyncLayer" => "Real-Time Sync Layer",
         "frontEndModernization" => "Front-End Modernization",
         "azureToAWSMigration" => "Azure-to-AWS Migration",
@@ -94,9 +96,57 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             // CareerTimeline diagram — stub until v0.1-diagrams phase
             div { class: "diagram-stub", "data-diagram": "CareerTimeline" }
         },
+        "aiNativeDeliveryTooling" => rsx! {
+            p {
+                "Built a local story-generation tool that drives the "
+                strong { class: "green-text", "Claude Code" }
+                " CLI from inside the application, to close the gap left by a vacant "
+                strong { class: "green-text", "Product Owner" }
+                " role."
+            }
+            hr {}
+            p {
+                "It reads context to sort work across the full set of story types the team writes against, from UI and API through "
+                strong { class: "green-text", "RBAC" }
+                " permissions and infrastructure, with a catch-all for anything not yet modelled. It builds the whole feature to child-story structure and asks clarifying questions before it writes anything."
+            }
+            hr {}
+            p {
+                "It is integrated end to end with "
+                strong { class: "green-text", "Azure DevOps" }
+                ": pull existing stories by ID or push new ones, carrying the full field mapping, from the parent feature link through story points and sprint. The tool is local and I run my own refinement through it. The stories it writes are real team artifacts."
+            }
+        },
+        "pythonServices" => rsx! {
+            p {
+                strong { class: "green-text", "Python" }
+                " is the language I have worked in longest here, across three production workloads, on a platform whose customer-facing stack is .NET and React."
+            }
+            hr {}
+            p {
+                "Our "
+                strong { class: "green-text", "Azure Functions" }
+                " were already Python when I joined and I have supported them since. During the AWS migration I folded a set of 14 of them into the "
+                strong { class: "green-text", "FastAPI" }
+                " microservice that replaces them, now deploying to "
+                strong { class: "green-text", "AWS ECS" }
+                ". Same workload, same language, new runtime."
+            }
+            hr {}
+            p {
+                "I also support a standalone Python service that redacts uploaded files by type, and I wrote and maintain the team's Python application-support scripts. Those scripts were the first Python I picked up here and I still reach for them day to day."
+            }
+        },
         "realTimeSyncLayer" => rsx! {
             p {
-                "Designed a "
+                "Beyond this layer I build and maintain the platform's "
+                strong { class: "green-text", ".NET" }
+                " API surface: endpoints, service layers and the data access behind the third-party risk workflows our customers run."
+            }
+            hr {}
+            p {
+                strong { class: "green-text", "Architected" }
+                " a "
                 strong { class: "green-text", "SignalR" }
                 " WebSocket layer linking the "
                 strong { class: "green-text", "React" }
@@ -117,6 +167,12 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             RealTimeSyncDiagram {}
         },
         "frontEndModernization" => rsx! {
+            p {
+                "I build customer-facing features across the "
+                strong { class: "green-text", "React" }
+                " application, from the component layer through to the API integration behind them."
+            }
+            hr {}
             p {
                 "Earlier in my tenure, as a Software Engineer, drove the front-end build stack from "
                 strong { class: "green-text", "Node 12 to Node 20" }
@@ -145,11 +201,11 @@ fn ExperienceDescription(props: ExperienceDescriptionProps) -> Element {
             }
             hr {}
             p {
-                "Built a Python "
+                "Hands on, I built the "
                 strong { class: "green-text", "FastAPI" }
-                " service and its Dockerfile to replace a set of 14 "
+                " service and its Dockerfile that replaces a set of 14 "
                 strong { class: "green-text", "Azure Functions" }
-                ", now being deployed to "
+                ", now deploying to "
                 strong { class: "green-text", "AWS ECS" }
                 ", while keeping the production Azure platform stable through the transition."
             }

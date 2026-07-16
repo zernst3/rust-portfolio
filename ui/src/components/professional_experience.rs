@@ -9,6 +9,8 @@ use crate::contexts::audio::use_audio_state;
 // All picker item keys in display order.
 const SP_ITEMS: &[&str] = &[
     "scopeAndTrajectory",
+    "aiNativeDeliveryTooling",
+    "pythonServices",
     "realTimeSyncLayer",
     "azureToAWSMigration",
     "leadershipAndDelivery",
@@ -66,6 +68,8 @@ fn item_label(key: &str) -> &'static str {
     match key {
         "credentials" => "Education & Certifications",
         "scopeAndTrajectory" => "Scope & Trajectory",
+        "aiNativeDeliveryTooling" => "AI-Native Delivery Tooling",
+        "pythonServices" => "Python Services",
         "realTimeSyncLayer" => "Real-Time Sync Layer",
         "azureToAWSMigration" => "Azure-to-AWS Migration",
         "leadershipAndDelivery" => "Leadership & Delivery",
